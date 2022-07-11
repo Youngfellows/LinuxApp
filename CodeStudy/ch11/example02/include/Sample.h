@@ -2,6 +2,7 @@
 #define SAMPLE_H
 
 #include "./Global.h"
+#include "./server/NetTcpServer.h"
 
 void test1();
 void test2();
