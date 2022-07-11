@@ -2,6 +2,9 @@
 #define IP_TRANSLATION_H
 
 #include "../Global.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 /**
  * @brief 实体类: IP地址转化

@@ -3,6 +3,7 @@
 
 #include "./Global.h"
 #include "./server/IPTranslation.h"
+#include "./server/HostnameTranslation.h"
 
 void test1();
 void test2();
