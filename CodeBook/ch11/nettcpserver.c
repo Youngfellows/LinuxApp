@@ -8,57 +8,57 @@
 
 int main() 
 { 
-    int sockfd,client_fd;	   //sock_fd-¼àÌıÌ×½Ó×ÖÃèÊö·û£»client_fd-Á¬½ÓÌ×½Ó×ÖÃèÊö·û
-    struct sockaddr_in my_addr;		//±¾»úµØÖ·
-    struct sockaddr_in remote_addr;	//¿Í»§¶ËµØÖ·
+    int sockfd,client_fd;	   //sock_fd-ç›‘å¬å¥—æ¥å­—æè¿°ç¬¦ï¼›client_fd-è¿æ¥å¥—æ¥å­—æè¿°ç¬¦
+    struct sockaddr_in my_addr;		//æœ¬æœºåœ°å€
+    struct sockaddr_in remote_addr;	//å®¢æˆ·ç«¯åœ°å€
 int val=1; 
-	//´´½¨Ì×½Ó×Ö
+	//åˆ›å»ºå¥—æ¥å­—
 if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
 { 
         perror("socket"); 
 exit(1); 
 }
-//ÉèÖÃµØÖ·¶Ë¿Ú¿ÉÖØÓÃ
+//è®¾ç½®åœ°å€ç«¯å£å¯é‡ç”¨
 
     setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)&val, sizeof(val) );
 	
-//ÉèÖÃ±¾µØµØÖ·ĞÅÏ¢
-    my_addr.sin_family=AF_INET; 				//Ğ­Òé×å
-    my_addr.sin_port=htons(3333); 		        //¶Ë¿Ú
-    my_addr.sin_addr.s_addr=inet_addr("127.0.0.1");//IPµØÖ·
-    bzero(&(my_addr.sin_zero),8); 				//Ìî³ä0
+//è®¾ç½®æœ¬åœ°åœ°å€ä¿¡æ¯
+    my_addr.sin_family=AF_INET; 				//åè®®æ—
+    my_addr.sin_port=htons(3333); 		        //ç«¯å£
+    my_addr.sin_addr.s_addr=inet_addr("127.0.0.1");//IPåœ°å€
+    bzero(&(my_addr.sin_zero),8); 				//å¡«å……0
 
-	//°ó¶¨µØÖ·µ½Ì×½Ó×ÖÃèÊö·ûÉÏ
+	//ç»‘å®šåœ°å€åˆ°å¥—æ¥å­—æè¿°ç¬¦ä¸Š
 if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))== -1) 
 { 
         perror("bind"); 
         exit(1); 
     }
-    //ÔÚµØÖ·¶Ë¿ÚÉÏ¼àÌı
+    //åœ¨åœ°å€ç«¯å£ä¸Šç›‘å¬
 if (listen(sockfd, 10) == -1) 
 { 
     	perror("listen"); 
         exit(1); 
     } 
-//µÈ´ı¿Í»§¶ËÁ¬½Ó£¬Èç¹ûÓĞ¿Í»§¶ËÁ¬½Ó£¬Ôò²úÉúĞÂµÄÁ¬½ÓÌ×½Ó×Ö   	
+//ç­‰å¾…å®¢æˆ·ç«¯è¿æ¥ï¼Œå¦‚æœæœ‰å®¢æˆ·ç«¯è¿æ¥ï¼Œåˆ™äº§ç”Ÿæ–°çš„è¿æ¥å¥—æ¥å­—   	
 int sin_size = sizeof(struct sockaddr_in);
    	if ((client_fd = accept(sockfd, (struct sockaddr *)&remote_addr,&sin_size)) == -1)
    	{
    		perror("accept"); 
 		exit(1); 
    	} 
-   	//Êä³ö¿Í»§¶ËIPµØÖ·
+   	//è¾“å‡ºå®¢æˆ·ç«¯IPåœ°å€
    	printf("received a connection from %s\n", inet_ntoa(remote_addr.sin_addr)); 
-   	//Ïò¿Í»§¶Ë·¢ËÍ»¶Ó­ĞÅÏ¢
+   	//å‘å®¢æˆ·ç«¯å‘é€æ¬¢è¿ä¿¡æ¯
    	if (send(client_fd, "Hello, you are connected!\n", 26, 0) == -1) 
    	{   
    		perror("send"); 
    		close(client_fd); 
       	exit(2); 
    	}
-   	//¹Ø±ÕÁ¬½ÓÌ×½Ó×Ö 
+   	//å…³é—­è¿æ¥å¥—æ¥å­— 
    	close(client_fd); 
-   	//¹Ø±Õ¼àÌıÌ×½Ó×Ö
+   	//å…³é—­ç›‘å¬å¥—æ¥å­—
    	close(sockfd); 
    	return 0;
 }

@@ -8,7 +8,7 @@
 
 int main() 
 { 
-int sockfd;         //Ì×½Ó×ÖÃèÊö·û
+int sockfd;         //å¥—æ¥å­—æè¿°ç¬¦
 	struct sockaddr_in server; 
 	struct sockaddr_in client; 
 	int sin_size; 
