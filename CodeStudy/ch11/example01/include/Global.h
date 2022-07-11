@@ -5,6 +5,10 @@
 #include <string>
 #include <memory>
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 using namespace std;
 
 #endif
