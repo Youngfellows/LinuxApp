@@ -197,38 +197,31 @@ bool NetTcpServer::receive(int connfd, struct sockaddr_in client)
     int receiveNum = 0;                //接收数据大小
     char receiveBuffer[MAX_DATA_SIZE]; //接收数据缓冲区
 
-    receiveNum = recv(connfd, receiveBuffer, MAX_DATA_SIZE, 0);
-    if (receiveNum == -1)
+    while (true)
     {
-        //接收数据异常,关闭连接
-        cout << "NetTcpServer::receive():: 1,接收数据异常,remote ip:" << remote << ",connfd:" << this->connfd << endl;
-        this->remove(connfd);
-        this->closeRemote(connfd);
-        return false;
-    }
-    else
-    {
-        cout << "NetTcpServer::receive():: 1,接收到,receiveNum:" << receiveNum << ",receiveBuffer:" << receiveBuffer << endl;
-        // string 转换为char *
-        char sendBuf[MAX_DATA_SIZE];
-        std::string message;
-        cin >> message;
-        strcpy(sendBuf, message.c_str());
-        cout << "send:" << sendBuf << endl;
-        this->sendToRemote(connfd, sendBuf);
-    }
+        receiveNum = recv(connfd, receiveBuffer, MAX_DATA_SIZE, 0);
+        cout << "NetTcpServer::receive():: receiveNum:" << receiveNum << endl;
+        if (receiveNum == -1)
+        {
+            //接收数据异常,关闭连接
+            cout << "NetTcpServer::receive():: 1,接收数据异常,remote ip:" << remote << ",connfd:" << this->connfd << endl;
+            this->remove(connfd);
+            this->closeRemote(connfd);
+            break;
+        }
+        else
+        {
+            cout << "NetTcpServer::receive():: 2,接收到,receiveNum:" << receiveNum << ",客户端说:" << receiveBuffer << endl;
 
-    //循环接收数据
-    while ((receiveNum = recv(connfd, receiveBuffer, MAX_DATA_SIZE, 0)))
-    {
-        cout << "NetTcpServer::receive():: 2,接收到,receiveNum:" << receiveNum << ",receiveBuffer:" << receiveBuffer << endl;
-        // string 转换为char *
-        char sendBuf[MAX_DATA_SIZE];
-        std::string message;
-        cin >> message;
-        strcpy(sendBuf, message.c_str());
-        cout << "send:" << sendBuf << endl;
-        this->sendToRemote(connfd, sendBuf);
+            //输入并回复给客户端
+            std::cout << "服务端输入:";
+            char sendBuf[MAX_DATA_SIZE];
+            std::string message;
+            cin >> message;
+            strcpy(sendBuf, message.c_str()); // string 转换为char *
+            // cout << "send:" << sendBuf << endl;
+            this->sendToRemote(connfd, sendBuf);
+        }
     }
     //接收数据异常,关闭连接
     cout << "NetTcpServer::receive():: 2,接收数据异常,remote ip:" << remote << ",connfd:" << this->connfd << endl;
