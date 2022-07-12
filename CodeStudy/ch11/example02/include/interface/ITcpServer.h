@@ -23,7 +23,7 @@ public:
     virtual bool listenSocket() = 0;                                 //简单socket套接字
     virtual void acceptRemote() = 0;                                 //接收客户端连接
     virtual bool receive(int connfd, struct sockaddr_in client) = 0; //接收到客户端数据
-    virtual bool sendToRemote() = 0;                                 //发送数据给客户端
+    virtual bool sendToRemote(int connfd, char *msg) = 0;            //发送数据给客户端
     virtual void closeRemote(int remotefd) = 0;                      //关闭客户端远程连接
     virtual void closeServer() = 0;                                  //关闭服务端连接
     virtual void add(int connfd, char *ip) = 0;                      //添加到容器

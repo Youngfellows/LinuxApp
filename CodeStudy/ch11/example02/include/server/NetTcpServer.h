@@ -27,17 +27,17 @@ private:
 public:
     NetTcpServer();
     ~NetTcpServer();
-    virtual bool createSocket() override;            //创建socket
-    virtual void setReusePort() override;            //设置端口可重用
-    virtual bool bindSocket() override;              //绑定到IP地址
-    virtual bool listenSocket() override;            //简单socket套接字
-    virtual void acceptRemote() override;            //接收客户端连接
-    virtual bool receive(int connfd, struct sockaddr_in client) override;                 //接收到客户端数据
-    virtual bool sendToRemote() override;            //发送数据给客户端
-    virtual void closeRemote(int remotefd) override; //关闭客户端远程连接
-    virtual void closeServer();                      //关闭服务端连接
-    virtual void add(int connfd, char *ip) override; //添加到容器
-    virtual void remove(int connfd) override;        //从容器移除
-    virtual bool isConnect() override;               //是否连接上客户端
+    virtual bool createSocket() override;                                 //创建socket
+    virtual void setReusePort() override;                                 //设置端口可重用
+    virtual bool bindSocket() override;                                   //绑定到IP地址
+    virtual bool listenSocket() override;                                 //简单socket套接字
+    virtual void acceptRemote() override;                                 //接收客户端连接
+    virtual bool receive(int connfd, struct sockaddr_in client) override; //接收到客户端数据
+    virtual bool sendToRemote(int connfd, char *msg) override;            //发送数据给客户端
+    virtual void closeRemote(int remotefd) override;                      //关闭客户端远程连接
+    virtual void closeServer();                                           //关闭服务端连接
+    virtual void add(int connfd, char *ip) override;                      //添加到容器
+    virtual void remove(int connfd) override;                             //从容器移除
+    virtual bool isConnect() override;                                    //是否连接上客户端
 };
 #endif

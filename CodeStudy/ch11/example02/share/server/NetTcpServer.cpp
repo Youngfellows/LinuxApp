@@ -209,12 +209,24 @@ bool NetTcpServer::receive(int connfd, struct sockaddr_in client)
     else
     {
         cout << "NetTcpServer::receive():: 1,接收到,receiveNum:" << receiveNum << ",receiveBuffer:" << receiveBuffer << endl;
+        //字符串拼接
+        char sendBuf[MAX_DATA_SIZE];
+        strcpy(sendBuf, receiveBuffer);
+        // strcat("杨过说,", sendBuf);
+        cout << "send:" << sendBuf << endl;
+        this->sendToRemote(connfd, sendBuf);
     }
 
     //循环接收数据
     while ((receiveNum = recv(connfd, receiveBuffer, MAX_DATA_SIZE, 0)))
     {
         cout << "NetTcpServer::receive():: 2,接收到,receiveNum:" << receiveNum << ",receiveBuffer:" << receiveBuffer << endl;
+        //字符串拼接
+        char sendBuf[MAX_DATA_SIZE];
+        strcpy(sendBuf, receiveBuffer);
+        // strcat("杨过说,", sendBuf);
+        cout << "send:" << sendBuf << endl;
+        this->sendToRemote(connfd, sendBuf);
     }
     //接收数据异常,关闭连接
     cout << "NetTcpServer::receive():: 2,接收数据异常,remote ip:" << remote << ",connfd:" << this->connfd << endl;
@@ -223,8 +235,22 @@ bool NetTcpServer::receive(int connfd, struct sockaddr_in client)
     return true;
 }
 
-bool NetTcpServer::sendToRemote()
+/**
+ * @brief 发送数据给客户端
+ *
+ * @param connfd 客户端套接字描述符
+ * @param msg 发送的消息
+ * @return true
+ * @return false
+ */
+bool NetTcpServer::sendToRemote(int connfd, char *msg)
 {
+    int res = send(connfd, msg, MAX_DATA_SIZE, 0);
+    cout << "NetTcpServer::sendToRemote():: res:" << res << endl;
+    if (res == -1)
+    {
+        return false;
+    }
     return true;
 }
 
