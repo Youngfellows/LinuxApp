@@ -128,9 +128,11 @@ void NetTcpServer::acceptRemote()
             this->add(this->connfd, remote);
             if (this->isConnect())
             {
-                //开启多线程处理每一个远程客户端连接
-                //接收客户端数据
+                //接收客户端数据,开启多线程处理每一个远程客户端连接
                 this->receive(this->connfd, remote_addr);
+                // std::shared_ptr<ITcpServer> pServer(this);
+                // std::shared_ptr<IHandleThread> handleThread = std::make_shared<HandleThread>();
+                // handleThread->start(this->connfd, remote_addr);
             }
         }
     }

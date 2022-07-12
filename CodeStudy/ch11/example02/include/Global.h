@@ -5,6 +5,12 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <thread>
+#include <mutex>
+#include <vector> 
+#include <algorithm>
+#include <functional>
+#include <condition_variable>
 
 using namespace std;
 

@@ -4,6 +4,11 @@
 #include "../interface/ITcpServer.h"
 #include "./HostnameTranslation.h"
 
+#include "./HandleThread.h"
+
+//先声明类,后面定义
+class HandleThread;
+
 /**
  * @brief TCP服务端
  * @brief 只支持单客户端,如果有多余一个客户端连接过来,关闭掉上一个连接
