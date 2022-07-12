@@ -1,43 +1,47 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <stdlib.h> 
+#include <stdio.h> 
+#include <string.h> 
+#include <unistd.h> 
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
 int main(int argc, char *argv[])
-{
-    int sockfd, recvbytes;
-    char buf[100];
-    struct hostent *host;
+{ 
+    int sockfd, recvbytes; 
+    char buf[100]; 
+    struct hostent *host; 
     struct sockaddr_in serv_addr;
 
-    //´´½¨Ì×½Ó×Ö
+	//åˆ›å»ºå¥—æ¥å­—
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-    {
-        perror("socket");
-        exit(1);
+    { 
+        perror("socket"); 
+        exit(1); 
     }
-    //ÉèÖÃ·şÎñÆ÷µØÖ·½á¹¹Ìå
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(3333);
-    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    bzero(&(serv_addr.sin_zero), 8);
-    //Ïò·şÎñÆ÷·¢ÆğÁ¬½Ó
-    if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr)) == -1)
-    {
-        perror("connect");
-        exit(1);
+    //è®¾ç½®æœåŠ¡å™¨åœ°å€ç»“æ„ä½“
+    serv_addr.sin_family=AF_INET; 
+    serv_addr.sin_port=htons(3333); 
+    serv_addr.sin_addr.s_addr=inet_addr("127.0.1.1");
+    bzero(&(serv_addr.sin_zero),8);
+    //å‘æœåŠ¡å™¨å‘èµ·è¿æ¥ 
+    if (connect(sockfd, (struct sockaddr *)&serv_addr,sizeof(struct sockaddr)) == -1) 
+    { 
+        perror("connect"); 
+        exit(1); 
     }
-    //½ÓÊÕ·şÎñÆ÷¶ËĞÅÏ¢²¢ÏÔÊ¾
-    if ((recvbytes = recv(sockfd, buf, 100, 0)) == -1)
+    char *msg = "ä½ å¥½å‘€";
+    strcpy(buf,msg);
+    send(sockfd,buf,sizeof(buf),0);
+
+    //æ¥æ”¶æœåŠ¡å™¨ç«¯ä¿¡æ¯å¹¶æ˜¾ç¤º
+    if ((recvbytes=recv(sockfd, buf, 100, 0)) ==-1) 
     {
-        perror("recv");
-        exit(1);
-    }
-    buf[recvbytes] = '\0'; //ÉèÖÃ×Ö·û´®½áÎ²
-    printf("Received: %s", buf);
-    //¹Ø±ÕÌ×½Ó×Ö
-    close(sockfd);
+        perror("recv"); 
+        exit(1); 
+    } 
+    buf[recvbytes] = '\0'; 	//è®¾ç½®å­—ç¬¦ä¸²ç»“å°¾
+    printf("Received: %s",buf); 
+    //å…³é—­å¥—æ¥å­—
+    close(sockfd); 
     return 0;
 }

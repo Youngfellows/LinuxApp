@@ -3,7 +3,7 @@
 NetTcpServer::NetTcpServer()
 {
     cout << "NetTcpServer()构造函数" << endl;
-    this->remotes = std::make_shared<std::map<char *, bool>>();
+    this->remotes = std::make_shared<std::map<int, char *>>();
 }
 
 NetTcpServer::~NetTcpServer()
@@ -47,10 +47,18 @@ void NetTcpServer::setReusePort()
  */
 bool NetTcpServer::bindSocket()
 {
-    this->my_addr.sin_family = AF_INET;                         //协议族
-    this->my_addr.sin_port = htons(SERVER_PORT);                //端口
-    this->my_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // IP地址
-    // this->my_addr.sin_addr.s_addr = htonl(INADDR_ANY); // IP地址
+    // IP地址与主机名相互转化
+    std::shared_ptr<HostnameTranslation> translation = std::make_shared<HostnameTranslation>();
+    char *hostname = translation->getHostName();
+    char *ip = translation->translateIP(hostname);
+    cout << "NetTcpServer::bindSocket():: IP:" << ip << endl;
+    // translation->translateHostname(ip);
+
+    this->my_addr.sin_family = AF_INET;          //协议族
+    this->my_addr.sin_port = htons(SERVER_PORT); //端口
+    // this->my_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // IP地址
+    this->my_addr.sin_addr.s_addr = inet_addr(ip); // IP地址
+    // this->my_addr.sin_addr.s_addr = htonl(INADDR_ANY);      // IP地址
     bzero(&(this->my_addr.sin_zero), 8); //填充0
 
     //绑定地址到套接字描述符上
@@ -85,67 +93,71 @@ bool NetTcpServer::listenSocket()
 }
 
 /**
- * @brief 等待客户端连接,如果有新的客户端连接,则产生新的连接套接字
+ * @brief 等待客户端连接，如果有新的客户端连接，则产生新的连接套接字
  *
  * @return true
  * @return false
  */
 void NetTcpServer::acceptRemote()
 {
-    /**
-    //等待客户端连接，如果有客户端连接，则产生新的连接套接字
-    int sin_size = sizeof(struct sockaddr_in);
-    if ((client_fd = accept(sockfd, (struct sockaddr *)&remote_addr, &sin_size)) == -1)
-    {
-        perror("accept");
-        exit(1);
-    }
-     *
-     */
     while (true)
     {
-        //开启多线程处理每一个远程客户端连接
         socklen_t sin_size = sizeof(struct sockaddr_in);
-        this->connfd = accept(this->sockfd, (struct sockaddr *)&remote_addr, &sin_size);
+        int newConnfd = accept(this->sockfd, (struct sockaddr *)&remote_addr, &sin_size);
         char *remote = inet_ntoa(remote_addr.sin_addr);
-        // cout << "NetTcpServer::acceptRemote():: remote ip:" << remote << ",connfd:" << this->connfd << endl;
-        if (this->connfd == -1)
+        cout << "NetTcpServer::acceptRemote():: remote ip:" << remote << ",connfd:" << this->connfd << endl;
+        if (newConnfd == -1)
         {
             //连接断开或者异常
             // cout << "服务端与远程客户端" << remote << "断开链接" << endl;
-            this->remove(remote);
+            this->remove(newConnfd);
         }
         else
         {
+            //保证只有一个连接,不处理多连接
+            if (newConnfd != this->connfd)
+            {
+                //把旧的已经连接的断开
+                this->remove(this->connfd);
+                closeRemote(this->connfd);
+                this->connfd = newConnfd; //新的连接
+            }
+
             //加如到已经连接容器列表中
-            cout << "服务端与远程客户端" << remote << "建立链接成功 ..." << endl;
-            this->add(remote);
+            cout << "服务端与远程客户端IP:" << remote << "建立链接成功,connfd:" << this->connfd << endl;
+            this->add(this->connfd, remote);
+            if (this->isConnect())
+            {
+                //开启多线程处理每一个远程客户端连接
+                //接收客户端数据
+                this->receive(this->connfd, remote_addr);
+            }
         }
     }
-    // return true;
 }
 
-void NetTcpServer::add(char *ip)
+void NetTcpServer::add(int connfd, char *ip)
 {
-    auto iter = this->remotes->find(ip);
+    auto iter = this->remotes->find(connfd);
     if (iter == this->remotes->end())
     {
-        this->remotes->insert(std::pair<char *, bool>(ip, true));
-        cout << "NetTcpServer::add():: 保存IP:" << ip << ",到已连接列表" << endl;
+        this->remotes->insert(std::pair<int, char *>(connfd, ip));
+        cout << "NetTcpServer::add():: 保存connfd:" << connfd << ",IP:" << ip << ",到已连接列表" << endl;
     }
     else
     {
-        cout << "NetTcpServer::add():: IP:" << ip << ",已经保存到了已连接列表,不要再插入了 ..." << endl;
+        cout << "NetTcpServer::add()::  connfd:" << connfd << ",IP:" << ip << ",已经保存到了已连接列表,不要再插入了 ..." << endl;
     }
 }
 
-void NetTcpServer::remove(char *ip)
+void NetTcpServer::remove(int connfd)
 {
-    auto iter = this->remotes->find(ip);
+    auto iter = this->remotes->find(connfd);
     if (iter != this->remotes->end())
     {
+        char *ip = iter->second;
         this->remotes->erase(iter);
-        cout << "NetTcpServer::remote():: 从已连接列表删除IP:" << ip << endl;
+        cout << "NetTcpServer::remote():: 从已连接列表删除IP:" << ip << ",connfd:" << connfd << endl;
     }
     else
     {
@@ -153,8 +165,59 @@ void NetTcpServer::remove(char *ip)
     }
 }
 
-bool NetTcpServer::receive()
+/**
+ * @brief 是否与客户端连接上
+ *
+ * @return true 连接上
+ * @return false 没有连接上
+ */
+bool NetTcpServer::isConnect()
 {
+    int size = this->remotes->size();
+    this->connet = size > 0;
+    cout << "NetTcpServer::isConnect():: size:" << size << ",connet:" << this->connet << endl;
+    return this->connet;
+}
+
+/**
+ * @brief 接收客户端数据
+ * @brief 开启多线程处理每一个远程客户端连接,否则可能出现一直阻塞的现象,新的客户端连接过来了,可以关闭掉旧的客户端
+ *
+ * @param connfd 客户端套接字描述符
+ * @param client 客户端地址
+ * @return true
+ * @return false
+ */
+bool NetTcpServer::receive(int connfd, struct sockaddr_in client)
+{
+    char *remote = inet_ntoa(remote_addr.sin_addr);
+    cout << "NetTcpServer::receive():: remote ip:" << remote << ",connfd:" << this->connfd << endl;
+    int receiveNum = 0;                //接收数据大小
+    char receiveBuffer[MAX_DATA_SIZE]; //接收数据缓冲区
+
+    receiveNum = recv(connfd, receiveBuffer, MAX_DATA_SIZE, 0);
+    if (receiveNum == -1)
+    {
+        //接收数据异常,关闭连接
+        cout << "NetTcpServer::receive():: 1,接收数据异常,remote ip:" << remote << ",connfd:" << this->connfd << endl;
+        this->remove(connfd);
+        this->closeRemote(connfd);
+        return false;
+    }
+    else
+    {
+        cout << "NetTcpServer::receive():: 1,接收到,receiveNum:" << receiveNum << ",receiveBuffer:" << receiveBuffer << endl;
+    }
+
+    //循环接收数据
+    while ((receiveNum = recv(connfd, receiveBuffer, MAX_DATA_SIZE, 0)))
+    {
+        cout << "NetTcpServer::receive():: 2,接收到,receiveNum:" << receiveNum << ",receiveBuffer:" << receiveBuffer << endl;
+    }
+    //接收数据异常,关闭连接
+    cout << "NetTcpServer::receive():: 2,接收数据异常,remote ip:" << remote << ",connfd:" << this->connfd << endl;
+    this->remove(connfd);
+    this->closeRemote(connfd);
     return true;
 }
 
@@ -165,8 +228,9 @@ bool NetTcpServer::sendToRemote()
 
 void NetTcpServer::closeRemote(int remotefd)
 {
+    close(remotefd); //关闭远程连接
 }
 
-void NetTcpServer::close()
+void NetTcpServer::closeServer()
 {
 }

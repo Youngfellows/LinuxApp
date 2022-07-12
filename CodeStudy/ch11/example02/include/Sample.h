@@ -3,6 +3,8 @@
 
 #include "./Global.h"
 #include "./server/NetTcpServer.h"
+#include "./server/HostnameTranslation.h"
+
 
 void test1();
 void test2();
