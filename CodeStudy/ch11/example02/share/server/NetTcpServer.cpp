@@ -209,10 +209,11 @@ bool NetTcpServer::receive(int connfd, struct sockaddr_in client)
     else
     {
         cout << "NetTcpServer::receive():: 1,接收到,receiveNum:" << receiveNum << ",receiveBuffer:" << receiveBuffer << endl;
-        //字符串拼接
+        // string 转换为char *
         char sendBuf[MAX_DATA_SIZE];
-        strcpy(sendBuf, receiveBuffer);
-        // strcat("杨过说,", sendBuf);
+        std::string message;
+        cin >> message;
+        strcpy(sendBuf, message.c_str());
         cout << "send:" << sendBuf << endl;
         this->sendToRemote(connfd, sendBuf);
     }
@@ -221,10 +222,11 @@ bool NetTcpServer::receive(int connfd, struct sockaddr_in client)
     while ((receiveNum = recv(connfd, receiveBuffer, MAX_DATA_SIZE, 0)))
     {
         cout << "NetTcpServer::receive():: 2,接收到,receiveNum:" << receiveNum << ",receiveBuffer:" << receiveBuffer << endl;
-        //字符串拼接
+        // string 转换为char *
         char sendBuf[MAX_DATA_SIZE];
-        strcpy(sendBuf, receiveBuffer);
-        // strcat("杨过说,", sendBuf);
+        std::string message;
+        cin >> message;
+        strcpy(sendBuf, message.c_str());
         cout << "send:" << sendBuf << endl;
         this->sendToRemote(connfd, sendBuf);
     }
