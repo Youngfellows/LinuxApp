@@ -3,7 +3,10 @@
 void test1()
 {
     cout << "test1():: ..." << endl;
-   
+    //使用多线程
+    std::map<string, int> *my = new std::map<string, int>();
+    std::thread test;
+
     cout << endl;
 }
 
