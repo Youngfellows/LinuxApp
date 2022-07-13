@@ -61,6 +61,10 @@ void test4()
     std::thread t2(myTask1);
     t1.join();
     t2.join();
+    while (true)
+    {
+        
+    }
     cout << "test4():: main finish ..." << endl;
     cout << endl;
 }

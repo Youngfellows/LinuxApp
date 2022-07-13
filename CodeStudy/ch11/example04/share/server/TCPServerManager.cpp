@@ -40,8 +40,8 @@ void TCPServerManager::acceptSocket()
         // std::thread *processThread = new std::thread(&&HandleThread::process, handlerThread);
         // processThread->join();
 
-        // HandleThread *handlerThread = new HandleThread(this);
-        // handlerThread->start(); //启动多线程
+        HandleThread *handlerThread = new HandleThread(this);
+        handlerThread->start(); //启动多线程
     }
 }
 

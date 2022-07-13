@@ -15,6 +15,7 @@ class HandleThread
 {
 private:
     TCPServerManager *manager = nullptr; //服务端对象
+    std::mutex g_display_mutex;          //互斥变量
 
 public:
     HandleThread(TCPServerManager *manager);
