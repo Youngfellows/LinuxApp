@@ -4,8 +4,6 @@
 #include "../interface/ITcpServer.h"
 #include "./HostnameTranslation.h"
 
-#include "./HandleThread.h"
-
 //先声明类,后面定义
 class HandleThread;
 
@@ -21,7 +19,7 @@ private:
     int connfd;                                               //客户端连接套接字描述符
     struct sockaddr_in my_addr;                               //服务端进程地址信息
     struct sockaddr_in remote_addr;                           //客户端地址
-    bool connet = false;                                      //是否与远程客户端连接上
+    bool iSconneted = false;                                      //是否与远程客户端连接上
     std::shared_ptr<std::map<int, char *>> remotes = nullptr; //远程客户端列表
 
 public:

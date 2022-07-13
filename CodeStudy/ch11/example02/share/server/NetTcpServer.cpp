@@ -128,11 +128,9 @@ void NetTcpServer::acceptRemote()
             this->add(this->connfd, remote);
             if (this->isConnect())
             {
+                cout << "conect ..." << endl;
                 //接收客户端数据,开启多线程处理每一个远程客户端连接
                 this->receive(this->connfd, remote_addr);
-                // std::shared_ptr<ITcpServer> pServer(this);
-                // std::shared_ptr<IHandleThread> handleThread = std::make_shared<HandleThread>();
-                // handleThread->start(this->connfd, remote_addr);
             }
         }
     }
@@ -176,9 +174,9 @@ void NetTcpServer::remove(int connfd)
 bool NetTcpServer::isConnect()
 {
     int size = this->remotes->size();
-    this->connet = size > 0;
-    cout << "NetTcpServer::isConnect():: size:" << size << ",connet:" << this->connet << endl;
-    return this->connet;
+    this->iSconneted = size > 0;
+    cout << "NetTcpServer::isConnect():: size:" << size << ",connet:" << this->iSconneted << endl;
+    return this->iSconneted;
 }
 
 /**
@@ -218,8 +216,9 @@ bool NetTcpServer::receive(int connfd, struct sockaddr_in client)
             char sendBuf[MAX_DATA_SIZE];
             std::string message;
             cin >> message;
+            // fgets(sendBuf,MAX_DATA_SIZE,stdin);
             strcpy(sendBuf, message.c_str()); // string 转换为char *
-            // cout << "send:" << sendBuf << endl;
+            cout << "send:" << sendBuf << endl;
             this->sendToRemote(connfd, sendBuf);
         }
     }
