@@ -7,10 +7,14 @@
 
 #include <thread>
 #include <mutex>
-#include <vector> 
+#include <vector>
 #include <algorithm>
 #include <functional>
 #include <condition_variable>
-using namespace std;
+#include <chrono>
 
+#include <unistd.h>      // for syscall()
+#include <sys/syscall.h> // for SYS_xxx definitions
+
+using namespace std;
 #endif
