@@ -108,7 +108,7 @@ void TCPServerManager::acceptSocket()
         socklen_t sin_size = sizeof(struct sockaddr_in);
         int newConnfd = accept(this->sockfd, (struct sockaddr *)&remote_addr, &sin_size);
         char *remote = inet_ntoa(remote_addr.sin_addr);
-        cout << "NetTcpServer::acceptRemote():: remote ip:" << remote << ",connfd:" << this->connfd << endl;
+        cout << "NetTcpServer::acceptRemote():: remote ip:" << remote << ",connfd:" << this->connfd << ",newConnfd:" << newConnfd << endl;
         if (newConnfd == -1)
         {
             //连接断开或者异常
@@ -216,7 +216,7 @@ bool TCPServerManager::sendRemote(int connfd, char *msg)
  */
 void TCPServerManager::closeRemote(int remotefd)
 {
-    cout << "TCPServerManager::closeRemote():: ..." << endl;
+    cout << "TCPServerManager::closeRemote():: remotefd:" << remotefd << endl;
     close(remotefd);
 }
 
