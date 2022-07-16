@@ -86,6 +86,10 @@ public:
      */
     MultiThreadProduceConsume(int size = 10, int pno = 1, int cno = 5) : buffsize(size), p_no(pno), c_no(cno){};
 
+    /**
+     * @brief 运行生产者消费者模型
+     *
+     */
     void run()
     {
         productTask();
