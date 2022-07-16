@@ -1,9 +1,13 @@
 #include "./include/Sample.h"
 
+int MultiThreadProduceConsume::item_id = 0;
+
 void test1()
 {
     cout << "test1():: ..." << endl;
-   
+    MultiThreadProduceConsume t;
+    t.run();
+
     cout << endl;
 }
 
