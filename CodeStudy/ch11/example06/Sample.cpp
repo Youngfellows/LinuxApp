@@ -5,6 +5,7 @@ int MultiThreadProduceConsume::item_id = 0;
 void test1()
 {
     cout << "test1():: ..." << endl;
+    //生产者消费者模型
     MultiThreadProduceConsume t;
     t.run();
 
