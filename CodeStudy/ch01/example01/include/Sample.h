@@ -2,6 +2,7 @@
 #define SAMPLE_H
 
 #include "./Global.h"
+#include "./manager/StudentManager.h"
 
 void test1();
 void test2();
