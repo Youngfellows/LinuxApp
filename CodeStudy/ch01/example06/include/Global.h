@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
 using namespace std;
 
