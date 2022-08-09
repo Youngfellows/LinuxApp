@@ -4,7 +4,7 @@
 #include "./Global.h"
 
 void test1();
-void test2();
+void test2(int argc, char *argv[]);
 void test3();
 void test4();
 
