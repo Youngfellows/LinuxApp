@@ -15,5 +15,6 @@ void test9();
 void test10();
 void getMode(struct stat buf);
 void printTime(time_t stAtime, time_t stMtime);
+long int getFileSize(const char *pathname);
 
 #endif

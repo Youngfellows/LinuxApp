@@ -267,15 +267,125 @@ void printTime(time_t stAtime, time_t stMtime)
     cout << "tmMtime2=" << dateTime << endl;
 }
 
+/**
+ * @brief 获取文件大小
+ *
+ * @param pathname 文件名
+ * @return long int
+ */
+long int getFileSize(const char *pathname)
+{
+    struct stat statbuff; //系统文件属性
+    long int size = 0;
+    int rt = stat(pathname, &statbuff); //获取系统文件属性
+    if (rt == -1)
+    {
+        perror("stat error");
+        size = 0;
+    }
+    else
+    {
+        off_t len = statbuff.st_size; //获取文件大小
+        size = len;
+    }
+    return size;
+}
+
+/**
+ * @brief 改变文件长度
+ *
+ */
 void test4()
 {
     cout << "test4():: ..." << endl;
+    const char *pathname = "./file/f3.txt"; //文件名
+    int fd = open(pathname, O_RDWR);        //打开文件
+    if (fd == -1)
+    {
+        perror("open error");
+        cout << "打开文件失败:" << pathname << endl;
+    }
+    else
+    {
+        //先读取原来文件内容,并输出到屏幕文件
+        int size = getFileSize(pathname);
+        cout << "改变之前文件大小:" << size << endl;
+        char buffer[100]; //缓冲区
+        int number;       //读取到的字节数
+        while ((number = read(fd, buffer, 100)) > 0)
+        {
+            write(1, buffer, number); //向屏幕文件输出
+        }
+        //改变文件长度
+        int rt = truncate(pathname, size * 3 / 4);
+        if (rt == -1)
+        {
+            perror("truncate error");
+            cout << "改变文件长度失败:" << pathname << endl;
+        }
+        else
+        {
+            cout << "改变文件长度成功:" << pathname << endl;
+            size = getFileSize(pathname);
+            cout << "改变之后文件大小:" << size << endl;
+            lseek(fd, 0, SEEK_SET); //文件指针定位到文件开头
+            //再次读出改变后的文件内容
+            memset(buffer, 0, sizeof(buffer)); //清空缓冲区
+            while ((number = read(fd, buffer, sizeof(buffer))) > 0)
+            {
+                write(1, buffer, number); //向屏幕文件输出
+            }
+        }
+        close(fd); //关闭文件
+    }
+
     cout << endl;
 }
 
 void test5()
 {
     cout << "test5():: ..." << endl;
+    const char *pathname = "./file/f4.txt"; //文件名
+    int fd = open(pathname, O_RDWR);        //打开文件
+    if (fd == -1)
+    {
+        perror("open error");
+        cout << "打开文件失败:" << pathname << endl;
+    }
+    else
+    {
+        //先读取原来文件内容,并输出到屏幕文件
+        int size = getFileSize(pathname);
+        cout << "改变之前文件大小:" << size << endl;
+        char buffer[100]; //缓冲区
+        int number;       //读取到的字节数
+        while ((number = read(fd, buffer, 100)) > 0)
+        {
+            write(1, buffer, number); //向屏幕文件输出
+        }
+        //改变文件长度
+        int rt = ftruncate(fd, size * 2);
+        if (rt == -1)
+        {
+            perror("truncate error");
+            cout << "改变文件长度失败:" << pathname << endl;
+        }
+        else
+        {
+            cout << "改变文件长度成功:" << pathname << endl;
+            size = getFileSize(pathname);
+            cout << "改变之后文件大小:" << size << endl;
+            lseek(fd, 0, SEEK_SET); //文件指针定位到文件开头
+            //再次读出改变后的文件内容
+            memset(buffer, 0, sizeof(buffer)); //清空缓冲区
+            while ((number = read(fd, buffer, sizeof(buffer))) > 0)
+            {
+                write(1, buffer, number); //向屏幕文件输出
+            }
+        }
+        close(fd); //关闭文件
+    }
+
     cout << endl;
 }
 

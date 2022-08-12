@@ -16,6 +16,7 @@
 #include <grp.h>
 #include <fcntl.h>
 #include <utime.h>
+#include <string.h>
 
 using namespace std;
 
