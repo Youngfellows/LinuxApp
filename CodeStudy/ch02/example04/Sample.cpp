@@ -371,28 +371,238 @@ void test7()
 void test8()
 {
     cout << "test8():: ..." << endl;
+    //创建符号链接文件
+    const char *actualpath = "./file/f2.txt"; //真实存在的文件
+    const char *sympath = "./file/f3";        //符号链接文件
+    int rt = symlink(actualpath, sympath);    //创建符号链接文件
+    if (rt == -1)
+    {
+        perror("symlink error");
+        cout << "创建符号链接文件失败:" << sympath << endl;
+    }
+    else
+    {
+        //读取符号链接所指原文件名
+        char buffer[100]; //保存文件名缓冲区
+        rt = readlink(sympath, buffer, sizeof(buffer));
+        if (rt == -1)
+        {
+            perror("readlink error");
+            cout << "读取符号链接所指原文件名错误 ..." << endl;
+        }
+        else
+        {
+            buffer[rt] = 0;
+            cout << "读取原文件名成功:" << buffer << endl;
+            char cache[1024];                //文件内容缓冲区
+            int fd = open(buffer, O_RDONLY); //打开文件
+            if (fd == -1)
+            {
+                perror("open error");
+                cout << "打开文件失败:" << buffer << endl;
+            }
+            else
+            {
+                //读取原文件内容
+                int number = 0;
+                while ((number = read(fd, cache, sizeof(cache))) > 0)
+                {
+                    write(1, cache, number); //向屏幕输出读取的内容
+                }
+                close(fd); //关闭文件
+            }
+        }
+    }
+
     cout << endl;
 }
 
+/**
+ * @brief 对指定的文件描述符进行复制
+ * @brief 共享文件指针
+ */
 void test9()
 {
     cout << "test9():: ..." << endl;
-    cout << endl;
-}
-void test10()
-{
-    cout << "test10():: ..." << endl;
+    const char *pathName = "./file/f4.txt";                 //文件名
+    int fd1;                                                //文件描述符
+    int fd2;                                                //文件描述符
+    int fd3;                                                //复制后的文件描述符
+    fd1 = open(pathName, O_RDWR | O_CREAT | O_TRUNC, 0644); //打开文件,如果存在则置空文件内容
+    if (fd1 == -1)
+    {
+        perror("open fd1 error");
+        cout << "打开文件失败:" << pathName << endl;
+        return;
+    }
+    cout << "fd1=" << fd1 << endl;
+    fd2 = open(pathName, O_RDWR); //再次打开文件,可读可写
+    if (fd2 == -1)
+    {
+        perror("open fd2 error");
+        cout << "打开文件失败:" << pathName << endl;
+        return;
+    }
+    cout << "fd2=" << fd2 << endl;
+    //复制文件描述符,通fd1共享文件指针
+    fd3 = dup(fd1);
+    if (fd3 == -1)
+    {
+        perror("dump error");
+        cout << "复制文件描述符fd1:" << fd1 << ",失败 ..." << endl;
+        return;
+    }
+    cout << "fd3=" << fd3 << endl;
+
+    //向fd1中写入文件,写入后,文件指针在最后
+    std::string content = "今天周五,好开心,马上周末啦...";
+    int length = content.size();
+    const char *buffer = content.c_str();    //字符串转化为字符数组
+    int number = write(fd1, buffer, length); //向文件写入内容
+    cout << "写入" << number << "个字节数据到文件:" << pathName << endl;
+
+    //读出fd2的数据
+    int size = length + 100;
+    char *cache = new char[size];    //动态申请内存
+    number = read(fd2, cache, size); //读取fd2文件描述符指向文件的数据
+    cache[number] = 0;
+    cout << "读取到fd2文件描述符数据," << number << "个字节数据:" << cache << endl;
+
+    //读取fd3文件描述符指向文件的数据,什么也读不到,因为fd1写入数据后,文件指针已经到最后啦
+    number = read(fd3, cache, size);
+    cache[number] = 0;
+    cout << "读取到fd3文件描述符数据," << number << "个字节数据:" << cache << endl;
+
+    lseek(fd3, 10, SEEK_SET); //移动文件指针到文件开头位置10个字节处
+    number = read(fd3, cache, size);
+    cache[number] = 0;
+    cout << "读取到fd3文件描述符数据," << number << "个字节数据:" << cache << endl;
+
+    //释放内存
+    delete[] cache;
+
+    //关闭文件
+    close(fd1);
+    close(fd2);
+    close(fd3);
     cout << endl;
 }
 
+/**
+ * @brief 输出重定向
+ *
+ */
+void test10()
+{
+    cout << "test10():: ..." << endl;
+    const char *pathname = "./file/f5.txt";                      //文件名
+    int fd1 = open(pathname, O_RDWR | O_CREAT | O_APPEND, 0644); //创建并打开一个文件,以追加方式写入数据
+    if (fd1 == -1)
+    {
+        perror("open error");
+        cout << "打开文件失败:" << pathname << endl;
+        return;
+    }
+    cout << "fd1=" << fd1 << endl;
+    // close(1);           //关闭标准输出文件1,会报错
+    int fd2 = dup(fd1); //文件描述符1成为最小可用文件描述符,因此把标准输出都重定向到文件描述符fd1对应的文件中
+    cout << "fd2=" << fd2 << endl;
+
+    //输出重定向
+    printf("哈哈,今天下雨哦,下班记得带雨伞 ...");
+
+    //关闭文件
+    close(fd1);
+    close(fd2);
+    cout << endl;
+}
+
+/**
+ * @brief 输入重定向
+ *
+ */
 void test11()
 {
     cout << "test11():: ..." << endl;
+    const char *pathname = "./file/f5.txt"; //文件名
+    int fd1 = open(pathname, O_RDWR, 0644); //创建并打开一个文件,以追加方式写入数据
+    if (fd1 == -1)
+    {
+        perror("open error");
+        cout << "打开文件失败:" << pathname << endl;
+        return;
+    }
+    cout << "fd1=" << fd1 << endl;
+    close(0);           //关闭标准输出文件1,会报错
+    int fd2 = dup(fd1); //文件描述符1成为最小可用文件描述符,因此把标准输出都重定向到文件描述符fd1对应的文件中
+    // cout << "fd2=" << fd2 << endl;
+
+    //输出重定向
+    // printf("哈哈,今天下雨哦,下班记得带雨伞2 ...");
+    char buffer[100];
+    scanf("%s", buffer);
+    printf("%s", buffer);
+
+    //关闭文件
+    close(fd1);
+    close(fd2);
     cout << endl;
 }
 
 void test12()
 {
     cout << "test12():: ..." << endl;
+    cout << endl;
+}
+
+void test13()
+{
+    cout << "test13():: ..." << endl;
+    cout << endl;
+}
+
+void test14()
+{
+    cout << "test14():: ..." << endl;
+    cout << endl;
+}
+
+void test15()
+{
+    cout << "test15():: ..." << endl;
+    cout << endl;
+}
+
+void test16()
+{
+    cout << "test16():: ..." << endl;
+    cout << endl;
+}
+void test17()
+{
+    cout << "test17():: ..." << endl;
+    cout << endl;
+}
+
+void test18()
+{
+    cout << "test18():: ..." << endl;
+    cout << endl;
+}
+
+void test19()
+{
+    cout << "test19():: ..." << endl;
+    cout << endl;
+}
+void test20()
+{
+    cout << "test20():: ..." << endl;
+    cout << endl;
+}
+
+void test21()
+{
+    cout << "test21():: ..." << endl;
     cout << endl;
 }
