@@ -254,7 +254,7 @@ void test3()
         cout << "grMem:" << grMem << endl;
         if (*grMem)
         {
-            cout << "*grMem:" << *grMem << endl;
+            cout << "*grMem:" << **grMem << endl;
         }
         else
         {
@@ -262,7 +262,7 @@ void test3()
         }
         while (*grMem != nullptr)
         {
-            cout << "组成员:" << *grMem << endl;
+            cout << "组成员:" << **grMem << endl;
             grMem++;
         }
     }
@@ -346,6 +346,25 @@ void test6()
 void test7()
 {
     cout << "test7():: ..." << endl;
+    //指针与二维数组
+    char *elements[] = {"C++", "Java", "Kotlin", "C", "Python"}; //二维数组
+    char **programs = elements;                                  //指针指向二维数组元素
+
+    // 1.打印二维数组元素
+    for (int i = 0; i < 5; i++)
+    {
+        char *program = elements[i];
+        cout << program << endl;
+    }
+
+    cout << "=======================" << endl;
+
+    // 2.打印二维数组元素
+    for (int i = 0; i < 5; i++)
+    {
+        char *program = *(programs + i); //获取二维数组元素
+        cout << program << endl;
+    }
     cout << endl;
 }
 
