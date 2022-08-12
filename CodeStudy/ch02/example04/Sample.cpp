@@ -196,30 +196,150 @@ void test1()
 void test2()
 {
     cout << "test2():: ..." << endl;
+    //获取用户信息
+    const char *fileName = "/etc/passwd"; //文件名
+    struct stat buf;                      //系统文件属性
+    int rt = lstat(fileName, &buf);       //获取系统文件属性
+    struct passwd *user = nullptr;        //文件用户信息
+    if (rt == -1)
+    {
+        perror("lstat error");
+        cout << "获取文件:" << fileName << ",系统文件属性错误 ..." << endl;
+    }
+    else
+    {
+        cout << "获取文件:" << fileName << ",系统文件属性成功 ..." << endl;
+        user = getpwuid(buf.st_uid);     //获取文件用户信息
+        char *uName = user->pw_name;     //用户名
+        char *uPasswd = user->pw_passwd; //用户密码
+        uid_t uUid = user->pw_uid;       //用户ID
+        gid_t gid = user->pw_gid;        //组ID
+        char *uGecos = user->pw_gecos;   //备注信息
+        char *mainDir = user->pw_dir;    //主目录
+        char *shell = user->pw_shell;    // Shell
+        cout << "uName:" << uName << endl;
+        cout << "uPasswd:" << uPasswd << endl;
+        cout << "uUid:" << uUid << endl;
+        cout << "gid:" << gid << endl;
+        cout << "uGecos:" << uGecos << endl;
+        cout << "mainDir:" << mainDir << endl;
+        cout << "shell:" << shell << endl;
+    }
     cout << endl;
 }
 
 void test3()
 {
     cout << "test3():: ..." << endl;
+    //获取所属组信息
+    const char *fileName = "/etc/passwd"; //文件名
+    struct stat buf;                      //系统文件属性
+    struct group *grp;                    //所属组信息
+    int rt = lstat(fileName, &buf);       //获取系统文件属性
+    if (rt == -1)
+    {
+        perror("lstat error");
+        cout << "获取" << fileName << ",文件系统属性失败 ..." << endl;
+    }
+    else
+    {
+        grp = getgrgid(buf.st_gid);      //获取所属组信息
+        char *grName = grp->gr_name;     //组名
+        char *grPasswd = grp->gr_passwd; //组密码
+        gid_t gid = grp->gr_gid;         //组ID
+        char **grMem = grp->gr_mem;      //组成员
+        cout << "grName:" << grName << endl;
+        cout << "grPasswd:" << grPasswd << endl;
+        cout << "gid:" << gid << endl;
+        cout << "grMem:" << grMem << endl;
+        if (*grMem)
+        {
+            cout << "*grMem:" << *grMem << endl;
+        }
+        else
+        {
+            cout << "组成员为空 ..." << endl;
+        }
+        while (*grMem != nullptr)
+        {
+            cout << "组成员:" << *grMem << endl;
+            grMem++;
+        }
+    }
     cout << endl;
 }
 
 void test4()
 {
     cout << "test4():: ..." << endl;
+    //创建一个硬连接文件
+    const char *from = "./file/f1.txt"; //已经存在的文件
+    const char *to = "./file/f2.txt";   //硬链接文件
+    int rt = link(from, to);            //创建一个硬连接文件
+    if (rt == -1)
+    {
+        perror("link error");
+        cout << "创建硬连接文件失败 ..." << endl;
+    }
+    else
+    {
+        cout << "创建硬连接文件成功:" << to << endl;
+    }
+
     cout << endl;
 }
 
 void test5()
 {
     cout << "test5():: ..." << endl;
+    //创建一个硬连接文件,删除改文件
+    const char *from = "./file/f1.txt"; //已经存在的文件
+    const char *to = "./file/f3.txt";   //硬链接文件
+    int rt = link(from, to);            //创建一个硬连接文件
+    if (rt == -1)
+    {
+        perror("link error");
+        cout << "创建硬连接文件失败 ..." << endl;
+    }
+    else
+    {
+        cout << "创建硬连接文件成功:" << to << endl;
+        //读取硬链接文件
+        int fd = open(to, O_RDONLY); //打开文件
+        if (fd == -1)
+        {
+            perror("open error");
+            cout << "打开文件失败:" << to << endl;
+        }
+        else
+        {
+            char buffer[100]; //缓冲区
+            int number;       //读取到的字节数
+            while ((number = read(fd, buffer, sizeof(buffer))))
+            {
+                write(1, buffer, number); //向屏幕输入读取到的内容
+            }
+            close(fd); //关闭文件
+        }
+    }
     cout << endl;
 }
 
 void test6()
 {
     cout << "test6():: ..." << endl;
+    //创建一个硬连接文件,删除改文件
+    const char *pathName = "./file/f3.txt"; //硬链接文件
+    int rt = unlink(pathName);              //删除硬连接文件
+    if (rt == -1)
+    {
+        perror("unlink error");
+        cout << "删除硬连接文件错误:" << pathName << endl;
+    }
+    else
+    {
+        cout << "删除硬连接文件成功:" << pathName << endl;
+    }
     cout << endl;
 }
 
