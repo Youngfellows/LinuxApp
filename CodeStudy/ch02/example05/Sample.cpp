@@ -389,9 +389,38 @@ void test5()
     cout << endl;
 }
 
+/**
+ * @brief 输出重定向
+ *
+ */
 void test6()
 {
     cout << "test6():: ..." << endl;
+    const char *pathname = "./file/f5.txt"; //文件名
+    int fd = open(pathname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1)
+    {
+        perror("open error");
+        cout << "打开文件失败:" << pathname << endl;
+    }
+    else
+    {
+        int rt = dup2(fd, 1); //把文件描述符fd复制到文件描述符1(标准输出)
+        if (rt == -1)
+        {
+            perror("dup2 error");
+            cout << "复制文件描述符失败:" << pathname << endl;
+        }
+        else
+        {
+            //输出重定向
+            std::string content = "今天是周六,在家好舒服...";
+            const char *content_str = content.c_str(); //字符串转换为字符数组
+            printf("%s\n", content_str);
+        }
+        close(fd); //关闭文件
+    }
+
     cout << endl;
 }
 
