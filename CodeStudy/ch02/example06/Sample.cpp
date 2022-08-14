@@ -1,7 +1,7 @@
 #include "./include/Sample.h"
 
 /**
- * @brief 实现ls功能
+ * @brief 实现"ls 文件"功能
  * @brief 测试: ./obj/test_sample.out -l /etc/passwd
  */
 void test1(int argc, char *argv[])
