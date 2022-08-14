@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
