@@ -3,7 +3,7 @@
 
 #include "./Global.h"
 
-void test1();
+void test1(int argc, char *argv[]);
 void test2();
 void test3();
 void test4();
