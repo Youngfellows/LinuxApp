@@ -4,6 +4,22 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <time.h>
+#include <pwd.h>
+#include <grp.h>
+#include <fcntl.h>
+#include <utime.h>
+#include <string.h>
+#include <dirent.h>
+#include <linux/fs.h>
+#include <libgen.h>
 
 using namespace std;
 
