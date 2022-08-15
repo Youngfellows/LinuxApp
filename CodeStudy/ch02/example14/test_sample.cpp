@@ -1,9 +1,9 @@
 #include "./include/Sample.h"
 
-int main(int arg,char *args[])
+int main(int arg, char *args[])
 {
-    test1();
-    test2();
+    // test1(arg, args);
+    test2(arg, args);
     test3();
     test4();
     return 0;
