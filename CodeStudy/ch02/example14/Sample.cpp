@@ -1,89 +1,27 @@
 #include "./include/Sample.h"
 
 /**
- * @brief 拷贝文件夹到目录
- * @brief "cp 文件 目录"
+ * @brief 创建符号连接文件
+ * @brief
  *
  * @param argc
  * @param argv
  */
-void test1(int argc, char *argv[])
+void test1()
 {
     cout << "test1():: ..." << endl;
-    if (argc != 3)
+    const char *actualpath = "./file1/f1.txt"; //真实的文件夹
+    const char *sympath1 = "./file1/f1_link1"; //符号连接文件1
+    const char *sympath2 = "./file1/f1_link2"; //符号连接文件1
+    int rt = symlink(actualpath, sympath1);    //创建符号连接文件1
+    if (rt == -1)
     {
-        printf("使用:%s 文件 目录\n", argv[0]);
-        return;
+        perror("symlink sympath1 error");
     }
-    char *spathname = argv[1];                //源文件
-    char *dpathname = argv[2];                //目标目录
-    int sFileType = checkFileType(spathname); //检测文件类型
-    int dFileType = checkFileType(dpathname); //检测文件类型
-    printf("sFileType:%d,dFileType:%d\n", sFileType, dFileType);
-    DIR *dir = opendir(dpathname); //打开目录文件
-    if (dir == nullptr)
+    rt = symlink(actualpath, sympath2); //创建符号连接文件1
+    if (rt == -1)
     {
-        perror("opendir error");
-        cout << "打开目录失败:" << dpathname << endl;
-        return;
-    }
-    errno = 0;
-    struct dirent *dent = nullptr;           //指向目录项的指针变量
-    while ((dent = readdir(dir)) != nullptr) //循环读取目录项
-    {
-        long nodeNum = dent->d_ino;    //索引节点
-        char *nodeName = dent->d_name; //文件名称
-        errno = 0;
-        printf("nodeNum:%ld,nodeName:%s\n", nodeNum, nodeName);
-    }
-    if (errno != 0)
-    {
-        perror("readdir error");
-    }
-
-    //提取文件名,提取路径
-    char *sFileName = basename(spathname); //提取文件名
-    char *sPath = strdup(spathname);       //提取文件路径
-    cout << "sFileName:" << sFileName << endl;
-    cout << "1,sPath:" << sPath << endl;
-    char *sDirName = dirname(sPath); //获取目录名称,sPath的值会被改变
-    cout << "2,sPath:" << sPath << endl;
-    cout << "sDirName:" << sDirName << endl;
-
-    //拷贝文件到目录
-    char *newPathNmae = new char[strlen(sFileName) + strlen(dpathname) + 1]; //新文件名
-    sprintf(newPathNmae, "%s/%s", dpathname, sFileName);                     //字符串拼接,新文件名
-    printf("newPathName:%s\n", newPathNmae);
-
-    int fromfd;       //源文件文件描述符
-    int tofd;         //目标文件文件描述符
-    char buffer[100]; //内容缓冲区
-
-    fromfd = open(spathname, O_RDONLY); //以只读方式打开要拷贝的源文件
-    if (fromfd == -1)
-    {
-        perror("open fromfd error");
-        cout << "打开源文件失败:" << spathname << endl;
-    }
-    else
-    {
-        tofd = open(newPathNmae, O_WRONLY | O_CREAT | O_TRUNC, 0644); //创建比打开文件
-        if (tofd == -1)
-        {
-            perror("open tofd error");
-            cout << "打开文件失败:" << newPathNmae << endl;
-        }
-        else
-        {
-            int number = 0;
-            //读取文件并写入新文件中
-            while ((number = read(fromfd, buffer, sizeof(buffer))) > 0)
-            {
-                write(tofd, buffer, number); //写入文件
-            }
-            close(tofd); //关闭文件
-        }
-        close(fromfd); //关闭文件
+        perror("symlink sympath2 error");
     }
     cout << endl;
 }
@@ -106,42 +44,81 @@ void test2(int argc, char *argv[])
     }
     char *fromDirName = argv[1]; //源目录
     char *toDirName = argv[2];   //目标目录
-    DIR *fromDir;                //指向源目录的指针变量
-    DIR *toDir;                  //指向目标目录的指针变量
-    // struct dirent *fromDent;        //指向目录项的指针变量
-    fromDir = opendir(fromDirName); //打开目录
-    if (fromDir == nullptr)
-    {
-        perror("opendir from dir error");
-        cout << "打开源目录失败:" << fromDirName << endl;
-        return;
-    }
-    toDir = opendir(toDirName); //打开目录
-    if (toDir == nullptr)
-    {
-        perror("opendir to dir error");
-        cout << "打开目录文件失败,errno:" << errno << "," << toDirName << endl;
-        int rt = mkdir(toDirName, 0644); //创建一个目录
-        if (rt == -1)
-        {
-            perror("mkdir error");
-            cout << "创建目录失败:" << toDirName << endl;
-        }
-        else
-        {
-            //目录创建成功,开始拷贝目录
-            cout << "目录创建成功,开始拷贝目录" << endl;
-            copyDir(fromDirName, toDirName, true);
-        }
-    }
-    else
-    {
-        //目录存在,开始拷贝目录
-        cout << "目录存在,开始拷贝目录" << endl;
-        copyDir(fromDirName, toDirName, true);
-    }
-
+    copyDir(fromDirName, toDirName);
     cout << endl;
+}
+
+/**
+ * @brief 拷贝符号连接文件
+ *
+ * @param fromPathName 源文件文件名称
+ * @param toPathName 目标文件文件名称
+ * @return int 成功返回0,失败返回1
+ */
+int copyLinkFile(char *fromPathName, char *toPathName)
+{
+    char buffer[1024];                                           //缓冲区
+    bzero(buffer, sizeof(buffer));                               //清空缓冲区
+    int number = readlink(fromPathName, buffer, sizeof(buffer)); //读取符号连接所指的原文件名,真实的文件
+    if (number != 0)
+    {
+        symlink(buffer, toPathName); //创建一个符号连接文件
+    }
+    return 0;
+}
+
+/**
+ * @brief 拷贝常规文件
+ *
+ * @param fromPathName 源文件文件名称
+ * @param toPathName 目标文件文件名称
+ * @return int 成功返回0,失败返回1
+ */
+int copyRegularFile(char *fromPathName, char *toPathName)
+{
+    int fromfd;                            //源文件文件描述符
+    int tofd;                              //目标文件文件描述符
+    fromfd = open(fromPathName, O_RDONLY); //打开源文件
+    if (fromfd == -1)
+    {
+        perror("open fromfd error");
+        return 1;
+    }
+    tofd = open(toPathName, O_RDWR | O_CREAT | O_TRUNC, 0666); //创建并打开文件,如果存在则置空
+    if (tofd == -1)
+    {
+        perror("open tofd error");
+        return 1;
+    }
+    char buffer[100];                                           //缓冲区
+    int number;                                                 //读取到字节数
+    bzero(buffer, sizeof(buffer));                              //清空缓冲区
+    while ((number = read(fromfd, buffer, sizeof(buffer) - 1))) //循环读取文件内容
+    {
+        int wNum = write(tofd, buffer, number); //拷贝到文件中
+        if (wNum < number)
+        {
+            wNum += write(tofd, buffer + wNum, number - wNum); //循环写入剩下的
+        }
+        bzero(buffer, sizeof(buffer)); //清空缓冲区
+    }
+    close(fromfd); //关闭文件
+    close(tofd);   //关闭文件
+
+    struct stat info; //系统文件属性
+    int rt = lstat(fromPathName, &info);
+    if (rt == -1)
+    {
+        perror("lstat error");
+        return 1;
+    }
+    rt = chmod(toPathName, info.st_mode); //改变文件访问权限
+    if (rt == -1)
+    {
+        perror("chmod error");
+        return 1;
+    }
+    return 0;
 }
 
 /**
@@ -151,105 +128,81 @@ void test2(int argc, char *argv[])
  * @param toDirName 目标目录
  * @param isCreateRoot 是否创建根目录
  */
-void copyDir(char *fromDirPathName, char *toDirPathName, bool isCreateRoot)
+int copyDir(char *fromDirPathName, char *toDirPathName)
 {
-    cout << endl;
-    cout << "copyDir:: isCreateRoot:" << isCreateRoot << ",fromDirPathName:" << fromDirPathName << ",toDirPathName:" << toDirPathName << endl;
-    cout << "0,toDirPathName:" << toDirPathName << endl;
+    cout << "copyDir:: fromDirPathName:" << fromDirPathName << ",toDirPathName:" << toDirPathName << endl;
     DIR *fromDir;            //指向源目录的指针变量
     DIR *toDir;              //指向目标目录的指针变量
+    struct stat info;        //目录或者文件系统文件属性
     struct dirent *fromDent; //指向目录项的指针变量
-    cout << "01,toDirPathName:" << toDirPathName << endl;
-    fromDir = opendir(fromDirPathName); //打开目录
-    cout << "02,toDirPathName:" << toDirPathName << endl;
+    char fromPathName[1024]; //源目录或者源文件路径
+    char toPathName[1024];   //目标目录或者目标文件路径
+
+    int rt = lstat(fromDirPathName, &info); //获取系统文件属性
+    if (rt == -1)
+    {
+        perror("lstat error");
+        return 1;
+    }
+    fromDir = opendir(fromDirPathName); //打开源目录
     if (fromDir == nullptr)
     {
         perror("opendir from dir error");
         cout << "打开源目录失败:" << fromDirPathName << endl;
-        return;
+        return 1;
     }
-    cout << "1,toDirPathName:" << toDirPathName << endl;
 
-    //提取文件名,提取路径
-    char *fromDirName = basename(fromDirPathName); //提取目录名称
-    char *fromDirPath = strdup(fromDirPathName);   //提取目录路径
-    cout << "fromDirName:" << fromDirName << endl;
-    cout << "1,fromDirPath:" << fromDirPath << endl;
-
-    char *fromParentDirPath = dirname(fromDirPath); //获取父目录名称,fromDirPath的值会被改变
-    cout << "2,fromDirPath:" << fromDirPath << endl;
-    cout << "fromParentDirPath:" << fromParentDirPath << endl;
-    cout << "2,toDirPathName:" << toDirPathName << endl;
-
-    //在新目录中创建一个源目录
-    char *newPathName = nullptr;
-    // char *newPathName = new char[strlen(toDirPathName) + strlen(fromDirName) + 1]; //新目录名
-    // sprintf(newPathName, "%s/%s", toDirPathName, fromDirName);                     //字符串拼接,新文件名
-    // printf("newPathName:%s\n", newPathName);
-    cout << "3,toDirPathName:" << toDirPathName << endl;
-
-    if (isCreateRoot)
+    //打开要拷贝的目录,如果不存在则创建该目录
+    toDir = opendir(toDirPathName); //打开目标目录
+    if (toDir == nullptr)
     {
-        newPathName = new char[strlen(toDirPathName) + strlen(fromDirName) + 1]; //新目录名
-        sprintf(newPathName, "%s/%s", toDirPathName, fromDirName);               //字符串拼接,新文件名
-        printf("newPathName:%s\n", newPathName);
-    }
-    else
-    {
-        cout << "toDirPathName:" << toDirPathName << endl;
-        newPathName = new char[strlen(toDirPathName) + 1];
-        strcpy(newPathName, toDirPathName);
-        newPathName[strlen(toDirPathName)] = '\0';
-    }
-    printf("newPathName:%s\n", newPathName);
-
-    //创建一个新目录
-    int rt = mkdir(newPathName, 0644);
-    if (rt == -1)
-    {
-        perror("mkdir new dir error");
-        cout << "创建新目录失败:" << newPathName << endl;
-        return;
+        rt = mkdir(toDirPathName, info.st_mode); //创建一个新目录
+        if (rt == -1)
+        {
+            perror("mkdir new dir error");
+            cout << "创建新目录失败:" << toDirPathName << endl;
+            return 1;
+        }
+        toDir = opendir(toDirPathName);
+        if (toDir == nullptr)
+        {
+            perror("opendir error");
+            return 1;
+        }
     }
 
     errno = 0;
     //循环读取源目录文件项内容,并且拷贝到新目录中
     while ((fromDent = readdir(fromDir)) != nullptr)
     {
-        long nodeNumber = fromDent->d_ino; //索引节点编号
-        char *nodeName = fromDent->d_name; //索引节点名称
-        printf("索引节点编号:%ld,索引节点名称:%s\n", nodeNumber, nodeName);
-        // cout << "is . dir " << (strcmp(nodeName, ".") == 0) << endl;
-        // cout << "is .. dir " << (strcmp(nodeName, "..") == 0) << endl;
+        bzero(fromPathName, sizeof(fromPathName)); //清空缓冲区
+        bzero(toPathName, sizeof(toPathName));     //清空缓冲区
 
-        //获取源目录路径或者文件路径
-        char *fromName = new char[strlen(fromDirPathName) + strlen(nodeName) + 1]; //文件路径(文件名)
-        sprintf(fromName, "%s/%s", fromDirPathName, nodeName);                     //字符串拼接,文件名
-        printf("fromName:%s\n", fromName);
-        int fileType = checkFileType(fromName);
-        printf("fileType:%d\n", fileType);
-        //递归拷贝目录
-        if ((fileType == 2))
+        // long nodeNumber = fromDent->d_ino; //索引节点编号
+        // char *nodeName = fromDent->d_name; //索引节点名称
+        // printf("索引节点编号:%ld,索引节点名称:%s\n", nodeNumber, nodeName);
+
+        if (*fromDent->d_name == '.') //过滤掉 "." ".."
+            continue;
+
+        sprintf(fromPathName, "%s/%s", fromDirPathName, fromDent->d_name); //构造完整的源文件(源目录)相对路径
+        sprintf(toPathName, "%s/%s", toDirPathName, fromDent->d_name);     //构造完整的目标文件(目标目录)相对路径
+        printf("fromPathName:%s\n", fromPathName);
+        printf("toPathName:%s\n", toPathName);
+
+        switch (checkFileType(fromPathName))
         {
-            if (((strcmp(nodeName, ".") == 0) || (strcmp(nodeName, "..") == 0)))
-            {
-                cout << "is . or .." << endl;
-            }
-            else
-            {
-                char *toDirName = new char[strlen(newPathName) + strlen(nodeName) + 1]; //文件路径(文件名)
-                sprintf(toDirName, "%s/%s", newPathName, nodeName);                     //字符串拼接,文件名
-                printf("toDirName:%s\n", toDirName);
-                delete[] newPathName;
-                copyDir(fromName, toDirName, false); //递归拷贝目录
-            }
-        }
-        else if (fileType == 1)
-        {
-            //拷贝单个源文件到指定路径
-            char *toName = new char[strlen(newPathName) + strlen(nodeName) + 1]; //文件路径(文件名)
-            sprintf(toName, "%s/%s", newPathName, nodeName);                     //字符串拼接,文件名
-            printf("toName:%s\n", toName);
+        case 1: //普通文件
+            copyRegularFile(fromPathName, toPathName);
+            break;
+        case 2: //目录文件,递归拷贝目录
+            copyDir(fromPathName, toPathName);
+            break;
+        case 3: //符号连接文件
+            copyLinkFile(fromPathName, toPathName);
+            break;
+        default:
+            break;
         }
     }
 
@@ -259,6 +212,9 @@ void copyDir(char *fromDirPathName, char *toDirPathName, bool isCreateRoot)
     }
 
     closedir(fromDir); //关闭目录
+    closedir(toDir);   //关闭目录
+    cout << endl;
+    return 0;
 }
 
 void test3()

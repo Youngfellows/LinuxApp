@@ -102,7 +102,7 @@ int mycp(char *dir1, char *dir2)
         perror("stat");
         return 1;
     }
-    chmod(dir2, info.st_mode); //拷贝文件属性
+    chmod(dir2, info.st_mode); //改变文件访问权限
     return 0;
 }
 
