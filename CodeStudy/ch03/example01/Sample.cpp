@@ -9,7 +9,7 @@ void test1()
     cout << "test1():: ..." << endl;
     char buffer[MAXLINE]; //输入缓冲区
     char *rt;             //每次输入的结果
-    char *args[64];       //字符串数组
+    char *args[SIZE];     //字符串数组
     int argNum = 0;       //字符串数组大小
 
     //循环输入字符串,并解析命令行参数
@@ -36,16 +36,23 @@ void test1()
         }
         printf("%ld,%s\n", strlen(buffer), buffer);
 
+        cout << "==============" << endl;
+        for (int i = 0; i < SIZE; i++)
+        {
+            printf("args[%d]=%p\n", i, args + i);
+        }
+
         printf("args=%p\n", args);
         //解析输入的字符串为字符串列表
         argNum = parse(buffer, args);
         printf("argNum=%d\n", argNum);
+        printf("%p\n", args);
         //遍历解析后的列表
-        // for (int i = 0; i < argNum; i++)
-        // {
-        //     char *arg = args[i];
-        //     printf("%s\n", arg);
-        // }
+        for (int i = 0; i < argNum; i++)
+        {
+            char *arg = *(args + i);
+            printf("args[%d]=%p,*(args+%d)=%s\n", i, (args + i), i, arg);
+        }
     }
 
     cout << endl;
@@ -83,7 +90,6 @@ int parse(char *originBuff, char **args)
     char temp[len]; //拷贝原始字符串
     char *buffer = temp;
     strcpy(buffer, originBuff); //拷贝原始字符串
-    // char buf[len];              //临时缓冲区
 
     int number = 0;         //参数列表个数
     int start = 0;          //字符开始的索引
@@ -102,16 +108,13 @@ int parse(char *originBuff, char **args)
             printf("1,size:%d\n", size);
             if ((size > 0) && ((originBuff[start] != '\0') && (originBuff[start] != ' ') && (originBuff[start] != '\t') && (originBuff[start] != '\n')))
             {
-                char buf[size];                         //临时缓冲区
-                memset(buf, 0, sizeof(buf));            //清空缓存
-                strncpy(buf, originBuff + start, size); //拷贝字符串
+                char *buf = (char *)malloc(size * sizeof(char)); //缓冲区
+                memset(buf, 0, size);                            //清空缓存
+                strncpy(buf, originBuff + start, size);          //拷贝字符串
                 buf[size - 1] = '\0';
                 printf("%s\n", buf);
-                printf("args=%p\n", args);
-                //*args++ = buf; //找到非空字符串依次赋值给args[i]
-                // strcpy(*args++, buf); //找到非空字符串依次赋值给args[i]
-                // memcpy(args[number], buf, size);
-                printf("args[%d]=%s\n", number, args[number]);
+                *(args + number) = buf; //找到非空字符串依次赋值给args[i]
+                printf("args[%d]=%p,*args[%d]=%s\n", number, args + number, number, *(args + number));
                 ++number;
             }
             start = end;
@@ -130,14 +133,13 @@ int parse(char *originBuff, char **args)
     printf("2,size:%d\n", size);
     if ((size > 0) && ((originBuff[start] != '\0') && (originBuff[start] != ' ') && (originBuff[start] != '\t') && (originBuff[start] != '\n')))
     {
-        char buf[size];              //临时缓冲区
-        memset(buf, 0, sizeof(buf)); //清空缓存
+        char *buf = (char *)malloc(size * sizeof(char)); //缓冲区
+        memset(buf, 0, size);                            //清空缓存
         strncpy(buf, originBuff + start, size);
         buf[size] = '\0';
         printf("%s\n", buf);
-        //*args++ = buf; //找到非空字符串依次赋值给args[i]
-        // strcpy(*args++, buf); //找到非空字符串依次赋值给args[i]
-        // printf("args[%d]=%s\n", number, args[number]);
+        *(args + number) = buf; //找到非空字符串依次赋值给args[i]
+        printf("args[%d]=%p,*args[%d]=%s\n", number, args + number, number, *(args + number));
         number++;
     }
     return number;

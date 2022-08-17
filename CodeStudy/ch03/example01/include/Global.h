@@ -13,5 +13,6 @@ using namespace std;
 
 //常量 - 容器大小
 const int MAXLINE = 4096;
+const int SIZE = 5;
 
 #endif
