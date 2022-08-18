@@ -1,0 +1,7 @@
+total 8
+-rwxrwxrwx 1 pandora pandora 1372 Aug 15 09:39 Makefile
+-rwxrwxrwx 1 pandora pandora 1361 Aug 18 15:33 Sample.cpp
+drwxrwxrwx 1 pandora pandora 4096 Aug 18 15:34 file
+drwxrwxrwx 1 pandora pandora 4096 Aug 16 16:00 include
+drwxrwxrwx 1 pandora pandora 4096 Aug 18 15:34 obj
+-rwxrwxrwx 1 pandora pandora  140 Aug 15 09:39 test_sample.cpp
