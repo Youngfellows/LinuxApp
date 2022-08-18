@@ -7,5 +7,7 @@ void test1();
 void test2();
 void test3();
 void test4();
+void func1();
+void func2();
 
 #endif
