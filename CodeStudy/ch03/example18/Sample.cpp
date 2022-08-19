@@ -3,6 +3,10 @@
 /**
  * @brief 循环输入命令行参数,并解析为字符串数组
  * @brief 在子进程中加载一个应用程序运行
+ * @brief 测试: ps u
+ * @brief 测试: ps -o pid,ppid,pgrp,session,tpgid,comm
+ * @brief 测试: pwd
+ * @brief 测试: ls -alh
  */
 void test1()
 {
@@ -74,6 +78,9 @@ void test1()
             else if (pid == 0)
             {
                 printf("子进程pid=%d\n", getpid());
+                // char *argv[] = {"ps", "-o", "pid,ppid,pgrp,session,tpgid,comm", NULL};
+                // execvp(argv[0], argv); //在子进程中运行加载一个应用程序
+                printf("%s\n", *args);
                 execvp(*args, args); //在子进程中运行加载一个应用程序
                 printf("不能够执行命令:%s\n", buffer);
                 exit(127);
@@ -178,5 +185,7 @@ int parse(char *originBuff, char **args)
         printf("args[%d]=%p,*args[%d]=%s\n", number, args + number, number, *(args + number));
         number++;
     }
+    *(args + number) = nullptr; //最后一个是NULL
+    number++;
     return number;
 }
