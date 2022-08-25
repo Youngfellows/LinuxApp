@@ -56,6 +56,12 @@ void test1()
  */
 void *reader(void *tid)
 {
+    randomSleep();
+    pthread_rwlock_rdlock(&rwlock); //对读写锁加读锁
+    readerNum++;
+    readFile(*((int *)tid));
+    readerNum--;
+    pthread_rwlock_unlock(&rwlock); //对读写锁解锁
     return nullptr;
 }
 
@@ -67,6 +73,12 @@ void *reader(void *tid)
  */
 void *writer(void *tid)
 {
+    randomSleep();
+    pthread_rwlock_wrlock(&rwlock); //对读写锁加写锁
+    writerNum++;
+    writeFile(*((int *)tid));
+    writerNum--;
+    pthread_rwlock_unlock(&rwlock); //对读写锁解锁
     return nullptr;
 }
 
@@ -77,6 +89,8 @@ void *writer(void *tid)
  */
 void readFile(int tid)
 {
+    printf("Reader ID:%d; Reader Num:%d; Writer Num:%d; Thread ID:%ld\n", tid, readerNum, writerNum, pthread_self());
+    randomSleep();
 }
 
 /**
@@ -86,6 +100,8 @@ void readFile(int tid)
  */
 void writeFile(int tid)
 {
+    printf("Writer ID:%d; Reader Num:%d; Writer Num:%d; Thread ID:%ld\n", tid, readerNum, writerNum, pthread_self());
+    randomSleep();
 }
 
 /**
