@@ -8,4 +8,7 @@ void test2();
 void test3();
 void test4();
 
+void *threadFunction1(void *para); //线程回调函数1
+void *threadFunction2(void *para); //线程回调函数2
+
 #endif
