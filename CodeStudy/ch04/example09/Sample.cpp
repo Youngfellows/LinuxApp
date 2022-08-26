@@ -1,5 +1,9 @@
 #include "./include/Sample.h"
 
+//定义进程数据
+int x = 0;
+int y = 0;
+
 /**
  * @brief 1. 创建一个简单的线程,不传递参数
  *
@@ -82,6 +86,35 @@ void test4()
 }
 
 /**
+ * @brief 5. 线程间共享进程数据
+ *
+ */
+void test5()
+{
+    cout << "test5():: ..." << endl;
+    pthread_t tid1; //线程1的ID
+    pthread_t tid2; //线程2的ID
+    int ret1;       //线程创建结果
+    int ret2;       //线程创建结果
+    cout << "test5():: Start, x=" << x << ",y=" << y << endl;
+    ret1 = pthread_create(&tid1, nullptr, threadFunction5, nullptr); //创建线程1
+    if (ret1 != 0)
+    {
+        perror("pthread_create error");
+        exit(0);
+    }
+    ret2 = pthread_create(&tid2, nullptr, threadFunction6, nullptr); //创建线程2
+    if (ret2 != 0)
+    {
+        perror("pthread_create error");
+        exit(0);
+    }
+    pthread_join(tid1, nullptr); //等待线程1结束
+    pthread_join(tid2, nullptr); //等待线程2结束
+    printf("主线程,开始执行,线程ID:%ld,x:%d,y:%d\n", pthread_self(), x, y);
+}
+
+/**
  * @brief 线程1回调函数
  *
  * @param para
@@ -148,4 +181,38 @@ void *threadFunction4(void *para)
     sleep(2); //子线程休眠2秒,阻塞
     printf("子线程4,结束了,线程ID:%ld\n", tid);
     pthread_exit(0); //结束子线程
+}
+
+/**
+ * @brief 线程5回调函数
+ *
+ * @param para
+ * @return void*
+ */
+void *threadFunction5(void *para)
+{
+    pthread_t tid = pthread_self(); //获取线程ID
+    printf("子线程1,开始执行,线程ID:%ld,x:%d,y:%d\n", tid, x, y);
+    y = 7;
+    sleep(1); //子线程1阻塞1秒
+    x = x + y;
+    printf("子线程1,结束执行,线程ID:%ld,x:%d,y:%d\n", tid, x, y);
+    pthread_exit(0); //退出子线程1
+}
+
+/**
+ * @brief 线程6回调函数
+ *
+ * @param para
+ * @return void*
+ */
+void *threadFunction6(void *para)
+{
+    pthread_t tid = pthread_self(); //获取线程ID
+    printf("子线程2,开始执行,线程ID:%ld,x:%d,y:%d\n", tid, x, y);
+    x = 9;
+    sleep(1); //子线程1阻塞1秒
+    y = 22 + y;
+    printf("子线程2,结束执行,线程ID:%ld,x:%d,y:%d\n", tid, x, y);
+    pthread_exit(0); //退出子线程1
 }
