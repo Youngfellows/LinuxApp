@@ -74,7 +74,8 @@ void *threadFunction(void *para)
 
     sleep(3); //子线程阻塞3秒
     printf("子线程ID:%ld,结束了 ...\n", tid);
-    pthread_exit(0); //结束子线程
+    pthread_attr_destroy(&gattr); //销毁属性
+    pthread_exit(0);              //结束子线程
 }
 
 void test2()

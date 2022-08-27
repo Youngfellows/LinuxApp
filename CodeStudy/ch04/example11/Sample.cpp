@@ -52,7 +52,7 @@ void *threadFunction(void *para)
     {
         printf("线程的分离状态图属性:%s\n", "PTHREAD_CREATE_JOINABLE");
     }
-
+    pthread_attr_destroy(&gattr); //销毁属性
     return (void *)nullptr;
 }
 
