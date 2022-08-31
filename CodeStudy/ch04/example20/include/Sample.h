@@ -8,4 +8,27 @@ void test2();
 void test3();
 void test4();
 
+/**
+ * @brief 线程回调函数
+ *
+ * @param para
+ * @return void*
+ */
+void *threadFunction1(void *para);
+
+/**
+ * @brief 线程回调函数
+ *
+ * @param para
+ * @return void*
+ */
+void *threadFunction2(void *para);
+
+/**
+ * @brief 线程清理函数
+ *
+ * @param arg
+ */
+void myCleanFunction(void *arg);
+
 #endif
