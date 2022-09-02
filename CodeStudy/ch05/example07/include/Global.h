@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <thread>
+#include <pthread.h>
+#include <sched.h>
 
 using namespace std;
 
