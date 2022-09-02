@@ -1,7 +1,10 @@
 #include "./include/Sample.h"
 
 //静态初始化互斥锁
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+// pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+//动态初始化互斥锁
+pthread_mutex_t *pmutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
 
 //共享全局变量
 int global = 0;
@@ -13,10 +16,11 @@ int global = 0;
 void test1()
 {
     cout << "test1():: ..." << endl;
-    pthread_t tid1;              //线程ID
-    pthread_t tid2;              //线程ID
-    int ret;                     //线程执行结果
-    for (int i = 0; i < 10; i++) //循环10次
+    pthread_t tid1;                      //线程ID
+    pthread_t tid2;                      //线程ID
+    int ret;                             //线程执行结果
+    pthread_mutex_init(pmutex, nullptr); //动态初始化互斥锁
+    for (int i = 0; i < 10; i++)         //循环10次
     {
         ret = pthread_create(&tid1, nullptr, threadFunction1, nullptr); //创建线程1
         if (ret != 0)
@@ -45,6 +49,7 @@ void test1()
         printf("global=%d\n", global); //打印2个线程累加后的全局变量
         global = 0;                    //置0
     }
+    pthread_mutex_destroy(pmutex); //销毁互斥锁
     cout << endl;
 }
 
@@ -60,9 +65,9 @@ void *threadFunction1(void *para)
     printf("开始执行子线程1,Thread ID:%ld\n", tid);
     for (int i = 0; i < 10000000; i++)
     {
-        pthread_mutex_lock(&mutex); //互斥锁加锁
+        pthread_mutex_lock(pmutex); //互斥锁加锁
         global++;
-        pthread_mutex_unlock(&mutex); //互斥锁解锁
+        pthread_mutex_unlock(pmutex); //互斥锁解锁
     }
     pthread_exit((void *)0); //结束子线程
 }
@@ -79,9 +84,9 @@ void *threadFunction2(void *para)
     printf("开始执行子线程2,Thread ID:%ld\n", tid);
     for (int i = 0; i < 10000000; i++)
     {
-        pthread_mutex_lock(&mutex); //互斥锁加锁
+        pthread_mutex_lock(pmutex); //互斥锁加锁
         global++;
-        pthread_mutex_unlock(&mutex); //互斥锁解锁
+        pthread_mutex_unlock(pmutex); //互斥锁解锁
     }
     pthread_exit((void *)0); //结束子线程
 }
