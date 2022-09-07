@@ -2,6 +2,8 @@
 #define SAMPLE_H
 
 #include "./Global.h"
+// #include "./Task.h"
+#include "./task/MyTask.h"
 
 void test1();
 void test2();
