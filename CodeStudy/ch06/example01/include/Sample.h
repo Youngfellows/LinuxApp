@@ -4,6 +4,7 @@
 #include "./Global.h"
 // #include "./Task.h"
 #include "./task/MyTask.h"
+#include "./ThreadPool.h"
 
 void test1();
 void test2();
