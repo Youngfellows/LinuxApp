@@ -16,7 +16,7 @@ void test1()
     int rtn;
     if (signal(SIGALRM, signalHandler) != SIG_ERR)
     {
-        rtn = alarm(4); //设置3秒定时器
+        rtn = alarm(6); //设置3秒定时器
         for (int i = 0; i < 10; i++)
         {
             sum += i;
@@ -68,9 +68,9 @@ void writeToFile()
 
     char num2[10];
     //_itoa(sum, num2, 10);
-    //printf("%s\n", num2);
+    // printf("%s\n", num2);
 
-    num = write(fd, buf, sizeof(int)); //向文件写入数据
+    num = write(fd, buf, strlen(buf)); //向文件写入数据
     printf("写入数据成功\n");
     close(fd); //关闭文件
 }
