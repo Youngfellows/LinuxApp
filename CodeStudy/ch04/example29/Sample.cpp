@@ -3,6 +3,12 @@
 void test1()
 {
     cout << "test1():: ..." << endl;
+    pid_t tid; //获取进程ID
+    tid = syscall(SYS_gettid);
+    printf("tid:%d\n", tid);
+    tid = syscall(SYS_tgkill, getpid(), tid, SIGHUP); //挂起
+    printf("tid:%d\n", tid);
+
     cout << endl;
 }
 
