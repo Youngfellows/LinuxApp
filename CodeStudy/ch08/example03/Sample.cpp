@@ -2,7 +2,7 @@
 
 /**
  * @brief 信号量举例
- * 
+ *
  */
 void test1()
 {
@@ -12,7 +12,6 @@ void test1()
 
 int P(int semid, int semnum)
 {
-
 }
 
 int V(int semid, int semnum)
