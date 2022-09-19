@@ -86,7 +86,7 @@ void *producerFunction(void *arg)
         mIn++;
         sem_post(&mMutex); // mMutex值增加1
         sem_post(&mFull);  // mFull值增加1
-        sleep(1);//休眠1秒
+        sleep(1);          //休眠1秒
     }
 }
 
