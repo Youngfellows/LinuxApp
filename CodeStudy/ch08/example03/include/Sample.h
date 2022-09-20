@@ -4,7 +4,7 @@
 #include "./Global.h"
 #include "./Semun.h"
 
-void test1();
+int test1(int argc, char **argv);
 void test2();
 void test3();
 void test4();
