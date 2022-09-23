@@ -2,7 +2,6 @@
 #define SAMPLE_H
 
 #include "./Global.h"
-#include "./Constant.h"
 
 void test1();
 void test2();
