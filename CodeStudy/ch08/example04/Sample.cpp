@@ -12,17 +12,40 @@ void test1()
     key_t key;                                //键值
     void *shmptr;                             //共享内存地址
     const char *content = "通知,国庆放假七天,需要加班,大哭 ...";
+
     if (access(pathname, F_OK) == 0) //判断文件存在
     {
         printf("exists file:%s\n", pathname);
         // remove(pathname); //删除文件
-        unlink(pathname); //删除文件
+        // unlink(pathname); //删除文件
+        key = ftok(pathname, 1); //产生关键字
+        if (key == -1)
+        {
+            perror("ftok failed");
+            exit(1); //结束进程
+        }
+        shmid = shmget(key, SHMSIZE, SHM_R | SHM_W); //打开共享内存
+        if (shmid == -1)
+        {
+            perror("shmget failed open");
+            exit(1);
+        }
+        if (shmctl(shmid, IPC_RMID, NULL) == -1) //删除共享内存
+        {
+            perror("shmctl failed");
+            exit(1);
+        }
     }
-    open(pathname, O_RDWR | O_CREAT | O_TRUNC); //创建并打开文件
-    key = ftok(pathname, 1);                    //产生关键字
+    int fd = open(pathname, O_RDWR | O_CREAT | O_TRUNC, 0644); //创建并打开文件
+    if (fd == -1)
+    {
+        perror("create file failed");
+        exit(1);
+    }
+    key = ftok(pathname, 1); //产生关键字
     if (key == -1)
     {
-        perror("ftok failed");
+        perror("ftok failed 2");
         exit(1); //结束进程
     }
     shmid = shmget(key, SHMSIZE, IPC_CREAT | IPC_EXCL | 0600); //创建或者打开共享内存
