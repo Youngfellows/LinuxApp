@@ -16,8 +16,8 @@ SERVER_DIR = "./share/server/"
 #全部.cpp文件
 SRCS_MAIN = $(wildcard *.cpp)
 SRCS_SHARE = $(wildcard ./share/*.cpp)
-# SRCS_SHARE_1 = $(wildcard ./share/client/*.cpp)
-# SRCS_SHARE_2 = $(wildcard ./share/server/*.cpp)
+SRCS_SHARE_1 = $(wildcard ./share/client/*.cpp)
+SRCS_SHARE_2 = $(wildcard ./share/server/*.cpp)
 
 #编译最终目标
 TARGET = test_sample.out
@@ -25,12 +25,12 @@ TARGET = test_sample.out
 #做模式替换,把.cpp替换成.o
 _DEPS_MAIN = $(patsubst %.cpp, %.o,$(SRCS_MAIN))
 _DEPS_SHARE = $(patsubst %.cpp, %.o,$(SRCS_SHARE))
-# _DEPS_SHARE_1 = $(patsubst %.cpp, %.o,$(SRCS_SHARE_1))
-# _DEPS_SHARE_2 = $(patsubst %.cpp, %.o,$(SRCS_SHARE_2))
+_DEPS_SHARE_1 = $(patsubst %.cpp, %.o,$(SRCS_SHARE_1))
+_DEPS_SHARE_2 = $(patsubst %.cpp, %.o,$(SRCS_SHARE_2))
 
 #指定编译文件
-# OBJS = $(_DEPS_MAIN) $(_DEPS_SHARE) $(_DEPS_SHARE_1) $(_DEPS_SHARE_2)
-OBJS = $(_DEPS_MAIN) $(_DEPS_SHARE)
+OBJS = $(_DEPS_MAIN) $(_DEPS_SHARE) $(_DEPS_SHARE_1) $(_DEPS_SHARE_2)
+# OBJS = $(_DEPS_MAIN) $(_DEPS_SHARE)
 
 all:$(TARGET)
 
@@ -49,7 +49,7 @@ clean:
 	rm -rf $(ODIR)
 	rm -rf *.o
 	rm -rf $(OHSARE_DIR)*.o 
-#	rm -rf $(CLIENT_DIR)*.o
-#	rm -rf $(SERVER_DIR)*.o
+	rm -rf $(CLIENT_DIR)*.o
+	rm -rf $(SERVER_DIR)*.o
 
 .PHONY: clean
