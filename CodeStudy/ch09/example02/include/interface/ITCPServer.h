@@ -28,7 +28,7 @@ public:
      * @return true 绑定地址到套接字描述符上成功
      * @return false 绑定地址到套接字描述符上失败
      */
-    virtual bool bind() = 0;
+    virtual bool bindSocket() = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -37,13 +37,13 @@ public:
      * @return true 在地址端口上监听成功
      * @return false 在地址端口上监听失败
      */
-    virtual bool listen() = 0;
+    virtual bool listenSocket() = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
      * @brief 接收客户端连接
      */
-    virtual void accept() = 0;
+    virtual void acceptSocket() = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -54,7 +54,7 @@ public:
      * @param size 缓冲区大小
      * @return int 返回接收的有效自己数
      */
-    virtual int receive(int sockfd, void *buffer, size_t size) = 0;
+    virtual int receive(int sockfd, void *buffer, int size) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -66,7 +66,7 @@ public:
      * @return true 发送消息成功
      * @return false 发送消息失败
      */
-    virtual bool send(int sockfd, void *buffer, size_t size) = 0;
+    virtual bool sendSocket(int sockfd, void *buffer, size_t size) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -74,7 +74,7 @@ public:
      *
      * @param sockfd socket套接字描述符
      */
-    virtual void close(int sockfd) = 0;
+    virtual void closeSocket(int sockfd) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
