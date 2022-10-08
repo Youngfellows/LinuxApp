@@ -3,8 +3,9 @@
 TCPServer::TCPServer()
 {
     cout << "TCPServer()构造函数 ..." << endl;
-    this->mConnfds = std::make_shared<std::map<int, char *>>(); //初始化容器列表
-    pthread_mutex_init(&mMutex, nullptr);                       //初始化互斥锁
+    this->mInputBuffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请内存
+    this->mConnfds = std::make_shared<std::map<int, char *>>();    //初始化容器列表
+    pthread_mutex_init(&mMutex, nullptr);                          //初始化互斥锁
 }
 
 TCPServer::~TCPServer()
@@ -186,7 +187,10 @@ void TCPServer::threadProcess(int connfd, char *remoteIp)
         if (recvbytes > 0)
         {
             buffer[recvbytes] = '\0'; //设置字符串结束标志
-            cout << buffer << endl;
+            cout << "客户端说:" << buffer << endl;
+            printf("回客户端:");
+            char *iMsg = input();                   //输入要回复的消息
+            sendSocket(connfd, iMsg, strlen(iMsg)); //测试,原样返回
         }
     }
 }
@@ -210,6 +214,13 @@ int TCPServer::receive(int sockfd, void *buffer, int size)
         return -1;
     }
     return recvbytes;
+}
+
+char *TCPServer::input()
+{
+    memset(mInputBuffer, 0, CACHESIZE * sizeof(char));        //清空缓冲区
+    fgets(mInputBuffer, CACHESIZE * sizeof(char) - 1, stdin); //输入字符串
+    return mInputBuffer;
 }
 
 /**

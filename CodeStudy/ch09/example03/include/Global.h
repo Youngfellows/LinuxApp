@@ -16,4 +16,8 @@
 
 using namespace std;
 
+//常量
+const int SERVPORT = 3333;  //端口号
+const int CACHESIZE = 1024; //缓冲区大小
+
 #endif

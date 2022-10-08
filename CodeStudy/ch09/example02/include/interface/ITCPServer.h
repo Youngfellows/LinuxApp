@@ -58,6 +58,12 @@ public:
 
     /**
      * @brief 纯虚函数,抽象接口
+     * @brief 输入要向服务端发送的消息
+     */
+    virtual char *input() = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
      * @brief 服务端向客户端发送消息
      *
      * @param sockfd  socket套接字描述符

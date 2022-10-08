@@ -2,6 +2,7 @@
 #define ITCP_CLIENT_H
 
 #include "../Global.h"
+#include "./NetUtil.h"
 
 /**
  * @brief 抽象类: 抽象TCP客户端
@@ -24,11 +25,11 @@ public:
     /**
      * @brief 纯虚函数,抽象接口
      * @brief 客户端向服务端发起连接请求
-     *
+     * @param  serverIp 防护网的IP地址
      * @return true 连接请求成功
      * @return false 连接请求失败
      */
-    virtual bool connect() = 0;
+    virtual bool connectSocket(char *serverIp) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -51,7 +52,19 @@ public:
      * @return true 发送消息成功
      * @return false 发送消息失败
      */
-    virtual bool send(int sockfd, void *buffer, size_t size) = 0;
+    virtual bool sendSocket(int sockfd, void *buffer, size_t size) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 输入要向服务端发送的消息
+     */
+    virtual char *input() = 0;
+
+    /**
+     * @brief  纯虚函数,抽象接口
+     * @brief  输入并向服务端发送消息
+     */
+    virtual void inputAndSend() = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -59,7 +72,7 @@ public:
      *
      * @param sockfd socket套接字描述符
      */
-    virtual void close(int sockfd) = 0;
+    virtual void closeSocket(int sockfd) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
