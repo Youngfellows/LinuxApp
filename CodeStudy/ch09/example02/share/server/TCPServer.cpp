@@ -220,6 +220,8 @@ char *TCPServer::input()
 {
     memset(mInputBuffer, 0, CACHESIZE * sizeof(char));        //清空缓冲区
     fgets(mInputBuffer, CACHESIZE * sizeof(char) - 1, stdin); //输入字符串
+    // getchar();                                                //吸收一个空格
+    printf("^^^^^^^^^^^\n");
     return mInputBuffer;
 }
 
