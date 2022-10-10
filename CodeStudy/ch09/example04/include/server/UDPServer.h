@@ -2,7 +2,6 @@
 #define UDP_SERVER_H
 
 #include "../interface/IUDPServer.h"
-#include "./RemoteInfo.h"
 #include "./NetUtil.h"
 
 /**
@@ -18,13 +17,13 @@ private:
     char *mCacheBuffer = nullptr;   //接收数据缓冲区
 
 public:
-    TCPServer();
-    ~TCPServer();
+    UDPServer();
+    ~UDPServer();
     virtual bool create() override;
     virtual bool bindSocket() override;
     virtual void acceptSocket() override;
-    virtual int receive(int sockfd, void *buffer, int size) override;
-    virtual bool sendSocket(int sockfd, void *buffer, size_t size) override;
+    virtual int receive(int sockfd, void *buffer, int size, struct sockaddr *from, socklen_t *fromlen) override;
+    virtual bool sendSocket(int sockfd, void *buffer, size_t size, struct sockaddr *to, socklen_t tolen) override;
     virtual char *input() override;
     virtual void closeSocket(int sockfd) override;
     virtual void destroy() override;

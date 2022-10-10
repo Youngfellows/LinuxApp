@@ -45,7 +45,7 @@ public:
      * @param size 缓冲区大小
      * @return int 返回接收的有效自己数
      */
-    virtual int receive(int sockfd, void *buffer, int size) = 0;
+    virtual int receive(int sockfd, void *buffer, int size, struct sockaddr *from, socklen_t *fromlen) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -63,7 +63,7 @@ public:
      * @return true 发送消息成功
      * @return false 发送消息失败
      */
-    virtual bool sendSocket(int sockfd, void *buffer, size_t size) = 0;
+    virtual bool sendSocket(int sockfd, void *buffer, size_t size, struct sockaddr *to, socklen_t tolen) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口

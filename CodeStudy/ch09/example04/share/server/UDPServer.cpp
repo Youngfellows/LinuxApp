@@ -71,40 +71,10 @@ void UDPServer::acceptSocket()
     {
         //接收UDP客户端的发送过来的数据
         memset(mCacheBuffer, 0, CACHESIZE * sizeof(char)); //清空缓冲区
-        int number = recvfrom(mSockfd, mCacheBuffer, 0, (struct sockaddr *)&clientAddr, (socklen_t *)&clentAddrLen);
-        // int number = recvfrom(mSockfd, mCacheBuffer, 0, (struct sockaddr *)&clientAddr, &sinSize);
-        if (number < 0)
-        {
-            perror("recvfrom error");
-            exit(1); //结束进程
-        }
-        mCacheBuffer[number] = '\0';
+        receive(mSockfd, mCacheBuffer, CACHESIZE, (struct sockaddr *)&clientAddr, (socklen_t *)&clentAddrLen);
         printf("你接收到%s的消息:%s\n", getIP(&clientAddr), mCacheBuffer);
         char *iMsg = input(); //输入要发送的内容
-    }
-}
-
-/**
- * @brief 线程回调函数
- *
- * @param arg 向线程传递的参数
- * @return void*
- */
-void UDPServer::threadProcess(int connfd, char *remoteIp)
-{
-    cout << "ThreadId:" << pthread_self() << ",connfd:" << connfd << ",IP:" << remoteIp << endl;
-    char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
-    while (true)
-    {
-        int recvbytes = receive(connfd, buffer, CACHESIZE);
-        if (recvbytes > 0)
-        {
-            buffer[recvbytes] = '\0'; //设置字符串结束标志
-            cout << "客户端说:" << buffer << endl;
-            printf("回客户端:");
-            char *iMsg = input();                   //输入要回复的消息
-            sendSocket(connfd, iMsg, strlen(iMsg)); //测试,原样返回
-        }
+        sendSocket(mSockfd, iMsg, strlen(iMsg), (struct sockaddr *)&clientAddr, sinSize);
     }
 }
 
@@ -117,15 +87,17 @@ void UDPServer::threadProcess(int connfd, char *remoteIp)
  * @param size 缓冲区大小
  * @return int 返回接收的有效自己数
  */
-int UDPServer::receive(int sockfd, void *buffer, int size)
+int UDPServer::receive(int sockfd, void *buffer, int size, struct sockaddr *from, socklen_t *fromlen)
 {
-    int recvbytes = recv(sockfd, (char *)buffer, size, 0); //接收客户端发送过来的消息
-    if (recvbytes == -1)
+    //接收UDP客户端的发送过来的数据
+    memset(buffer, 0, CACHESIZE * sizeof(char)); //清空缓冲区
+    int recvbytes = recvfrom(sockfd, (char *)buffer, CACHESIZE, 0, from, fromlen);
+    if (recvbytes < 0)
     {
-        perror("receive sockfd failed");
-        removeConnfd(sockfd); //接收数据异常,移除客户端连接列表
-        return -1;
+        perror("recvfrom error");
+        exit(1); //结束进程
     }
+    mCacheBuffer[recvbytes] = '\0';
     return recvbytes;
 }
 
@@ -148,9 +120,9 @@ char *UDPServer::input()
  * @return true 发送消息成功
  * @return false 发送消息失败
  */
-bool UDPServer::sendSocket(int sockfd, void *buffer, size_t size)
+bool UDPServer::sendSocket(int sockfd, void *buffer, size_t size, struct sockaddr *to, socklen_t tolen)
 {
-    int res = send(sockfd, (char *)buffer, size, 0); //向客户端发送消息
+    int res = sendto(sockfd, (char *)buffer, size, 0, to, tolen); //向客户端发送消息
     if (res == -1)
     {
         perror("send message failed");
@@ -168,7 +140,6 @@ bool UDPServer::sendSocket(int sockfd, void *buffer, size_t size)
 void UDPServer::closeSocket(int sockfd)
 {
     close(sockfd); //关闭socket套接字描述符
-    removeConnfd(sockfd);
 }
 
 /**
@@ -178,12 +149,6 @@ void UDPServer::closeSocket(int sockfd)
 void UDPServer::destroy()
 {
     closeSocket(mSockfd);
-    for (auto iter = mConnfds->begin(); iter != mConnfds->end(); iter++)
-    {
-        int sockfd = iter->first;
-        closeSocket(sockfd);
-    }
-    mConnfds->clear(); //清空容器
 }
 
 /**
