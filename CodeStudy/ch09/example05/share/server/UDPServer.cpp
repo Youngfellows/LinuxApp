@@ -10,7 +10,6 @@ UDPServer::UDPServer()
 UDPServer::~UDPServer()
 {
     cout << "~UDPServer()析构函数 ..." << endl;
-    destroy();
 }
 
 /**
@@ -67,7 +66,10 @@ void UDPServer::acceptSocket()
     struct sockaddr_in clientAddr;            //客户端地址
     int clentAddrLen;                         //客户端地址长度
     int sinSize = sizeof(struct sockaddr_in); //客户端地址长度
-
+    printf("客户端发:");
+    char *iMsg = input(); //输入要发送的内容
+    sendSocket(mSockfd, iMsg, strlen(iMsg), (struct sockaddr *)&clientAddr, sinSize);
+    
     while (true)
     {
         //接收UDP客户端的发送过来的数据
@@ -76,7 +78,7 @@ void UDPServer::acceptSocket()
         if (number > 0)
         {
             printf("你接收到%s的消息:%s\n", getIP(&clientAddr), mCacheBuffer);
-            printf("服务端回复:");
+            printf("客户端发:");
             char *iMsg = input(); //输入要发送的内容
             sendSocket(mSockfd, iMsg, strlen(iMsg), (struct sockaddr *)&clientAddr, sinSize);
         }
@@ -100,7 +102,7 @@ int UDPServer::receive(int sockfd, void *buffer, int size, struct sockaddr *from
     if (recvbytes < 0)
     {
         // perror("recvfrom error");
-        //  exit(1); //结束进程
+        // exit(1); //结束进程
     }
     mCacheBuffer[recvbytes] = '\0';
     return recvbytes;

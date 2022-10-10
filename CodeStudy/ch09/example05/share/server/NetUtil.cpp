@@ -1,4 +1,4 @@
-#include "../../include/interface/NetUtil.h"
+#include "../../include/server/NetUtil.h"
 
 NetUtil::NetUtil()
 {

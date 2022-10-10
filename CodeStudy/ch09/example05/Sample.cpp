@@ -1,28 +1,25 @@
 #include "./include/Sample.h"
 
-/**
- * @brief TCP客户端
- *
- */
 void test1()
 {
     cout << "test1():: ..." << endl;
-    std::shared_ptr<ITCPClient> tcpClient = std::make_shared<TCPClient>();
-    bool res = tcpClient->create(); //创建Socket连接
-    if (res)
-    {
-        res = tcpClient->connectSocket(nullptr); //客户端连接Socket服务端
-        if (res)
-        {
-            tcpClient->inputAndSend(); //输入并发送消息给客户端
-        }
-    }
+    NetUtil::getIP();
     cout << endl;
 }
 
 void test2()
 {
     cout << "test2():: ..." << endl;
+    std::shared_ptr<UDPServer> server = std::make_shared<UDPServer>();
+    bool res = server->create();
+    if (res)
+    {
+        res = server->bindSocket();
+        if (res)
+        {
+            server->acceptSocket();
+        }
+    }
     cout << endl;
 }
 

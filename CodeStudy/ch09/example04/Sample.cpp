@@ -7,9 +7,23 @@ void test1()
     cout << endl;
 }
 
+/**
+ * @brief UDP服务端
+ *
+ */
 void test2()
 {
     cout << "test2():: ..." << endl;
+    std::shared_ptr<UDPServer> server = std::make_shared<UDPServer>();
+    bool res = server->create();
+    if (res)
+    {
+        res = server->bindSocket();
+        if (res)
+        {
+            server->acceptSocket();
+        }
+    }
     cout << endl;
 }
 

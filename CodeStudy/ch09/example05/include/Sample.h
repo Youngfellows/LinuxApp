@@ -2,7 +2,8 @@
 #define SAMPLE_H
 
 #include "./Global.h"
-#include "./client/TCPClient.h"
+#include "./server/NetUtil.h"
+#include "./server/UDPServer.h"
 
 void test1();
 void test2();

@@ -1,35 +1,40 @@
-#ifndef ITCP_CLIENT_H
-#define ITCP_CLIENT_H
+#ifndef IUDP_SERVER_H
+#define IUDP_SERVER_H
 
 #include "../Global.h"
-#include "./NetUtil.h"
 
 /**
- * @brief 抽象类: 抽象TCP客户端
+ * @brief 抽象类: 抽象UDP服务端
  *
  */
-class ITCPClient
+class IUDPServer
 {
 public:
-    virtual ~ITCPClient() = default;
+    virtual ~IUDPServer() = default;
 
     /**
      * @brief 纯虚函数,抽象接口
-     * @brief 创建TCP客户端
+     * @brief 创建TCP服务端
      *
-     * @return true 创建TCP客户端成功
-     * @return false 创建TCP客户端失败
+     * @return true 创建UDP服务端成功
+     * @return false 创建UDP服务端失败
      */
     virtual bool create() = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
-     * @brief 客户端向服务端发起连接请求
-     * @param  serverIp 防护网的IP地址
-     * @return true 连接请求成功
-     * @return false 连接请求失败
+     * @brief 绑定地址到套接字描述符上
+     *
+     * @return true 绑定地址到套接字描述符上成功
+     * @return false 绑定地址到套接字描述符上失败
      */
-    virtual bool connectSocket(char *serverIp) = 0;
+    virtual bool bindSocket() = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 接收客户端连接
+     */
+    virtual void acceptSocket() = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -40,7 +45,13 @@ public:
      * @param size 缓冲区大小
      * @return int 返回接收的有效自己数
      */
-    virtual int receive(int sockfd, void *buffer, size_t size) = 0;
+    virtual int receive(int sockfd, void *buffer, int size, struct sockaddr *from, socklen_t *fromlen) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 输入要向服务端发送的消息
+     */
+    virtual char *input() = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -52,19 +63,7 @@ public:
      * @return true 发送消息成功
      * @return false 发送消息失败
      */
-    virtual bool sendSocket(int sockfd, void *buffer, size_t size) = 0;
-
-    /**
-     * @brief 纯虚函数,抽象接口
-     * @brief 输入要向服务端发送的消息
-     */
-    virtual char *input() = 0;
-
-    /**
-     * @brief  纯虚函数,抽象接口
-     * @brief  输入并向服务端发送消息
-     */
-    virtual void inputAndSend() = 0;
+    virtual bool sendSocket(int sockfd, void *buffer, size_t size, struct sockaddr *to, socklen_t tolen) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
@@ -76,7 +75,7 @@ public:
 
     /**
      * @brief 纯虚函数,抽象接口
-     * @brief 销毁TCP客户端
+     * @brief 销毁TCP服务端
      */
     virtual void destroy() = 0;
 
