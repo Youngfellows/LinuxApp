@@ -184,7 +184,7 @@ void TCPServer::threadProcess(int connfd, char *remoteIp)
             {
                 char buf[100]; //缓冲区
                 int number = 0;
-                while (number = read(fd, buf, 100)) //读文件
+                while ((number = read(fd, buf, 100)) > 0) //读文件
                 {
                     sendSocket(connfd, buf, number); //向客户端发送文件
                 }
