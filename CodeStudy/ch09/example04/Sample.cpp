@@ -17,11 +17,7 @@ void test2()
         res = tcpServer->bindSocket(); //绑定本机网络地址信息
         if (res)
         {
-            res = tcpServer->listenSocket(); //监听TCP Socket套接字
-            if (res)
-            {
-                tcpServer->acceptSocket(); //等待客户端来连接服务端
-            }
+            tcpServer->acceptSocket(); //等待客户端来连接服务端
         }
     }
 

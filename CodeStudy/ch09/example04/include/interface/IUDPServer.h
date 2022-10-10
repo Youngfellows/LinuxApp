@@ -1,23 +1,23 @@
-#ifndef ITCP_SERVER_H
-#define ITCP_SERVER_H
+#ifndef IUDP_SERVER_H
+#define IUDP_SERVER_H
 
 #include "../Global.h"
 
 /**
- * @brief 抽象类: 抽象TCP服务端
+ * @brief 抽象类: 抽象UDP服务端
  *
  */
-class ITCPServer
+class IUDPServer
 {
 public:
-    virtual ~ITCPServer() = default;
+    virtual ~IUDPServer() = default;
 
     /**
      * @brief 纯虚函数,抽象接口
      * @brief 创建TCP服务端
      *
-     * @return true 创建TCP服务端成功
-     * @return false 创建TCP服务端失败
+     * @return true 创建UDP服务端成功
+     * @return false 创建UDP服务端失败
      */
     virtual bool create() = 0;
 
@@ -29,15 +29,6 @@ public:
      * @return false 绑定地址到套接字描述符上失败
      */
     virtual bool bindSocket() = 0;
-
-    /**
-     * @brief 纯虚函数,抽象接口
-     * @brief 在地址端口上监听
-     *
-     * @return true 在地址端口上监听成功
-     * @return false 在地址端口上监听失败
-     */
-    virtual bool listenSocket() = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
