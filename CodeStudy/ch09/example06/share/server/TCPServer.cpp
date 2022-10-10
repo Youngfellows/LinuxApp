@@ -163,17 +163,21 @@ void TCPServer::threadProcess(int connfd, char *remoteIp)
 {
     cout << "ThreadId:" << pthread_self() << ",connfd:" << connfd << ",IP:" << remoteIp << endl;
     char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
-    const char *pdir = "../../file/";                        //父目录
+    const char *pdir = "./file/";                            //父目录
     while (true)
     {
         int recvbytes = receive(connfd, buffer, CACHESIZE);
         if (recvbytes > 0)
         {
             // buffer[recvbytes] = '\0'; //设置字符串结束标志
+            printf("1,长度:%ld,文件名:%s****\n", strlen(buffer), buffer);
+            char *filename = new char[strlen(buffer) - 1]; //文件名
+            strncpy(filename, buffer, strlen(buffer) - 1);
+            printf("2,长度:%ld,文件名:%s****\n", strlen(buffer), buffer);
             char *pathname = new char[strlen(pdir) + strlen(buffer) + 1];
-            sprintf(pathname, "%s%s", pdir, buffer); //字符串拼接
-            // const char *pathname = "../../file/f1.txt";
-            cout << "文件名:" << pathname << endl;
+            sprintf(pathname, "%s%s", pdir, filename); //字符串拼接
+            // const char *pathname = "./file/f1.txt";
+            printf("长度:%ld,文件路径:%s\n", strlen(pathname), pathname);
             int fd = open(pathname, O_RDONLY); //打开文件
             if (fd == -1)
             {
