@@ -179,6 +179,7 @@ void TCPServer::threadProcess(int connfd, char *remoteIp)
             // const char *pathname = "./file/f1.txt";
             printf("长度:%ld,文件路径:%s\n", strlen(pathname), pathname);
             int fd = open(pathname, O_RDONLY); //打开文件
+            char *sign = "finish";
             if (fd == -1)
             {
                 perror("open file failed");
@@ -190,10 +191,14 @@ void TCPServer::threadProcess(int connfd, char *remoteIp)
                 int number = 0;
                 while ((number = read(fd, buf, 100)) > 0) //读文件
                 {
+                    // printf("%d\n", number);
                     sendSocket(connfd, buf, number); //向客户端发送文件
-                    memset(buf, 0, sizeof(buf));     //清空缓冲区F
+                    memset(buf, 0, sizeof(buf));     //清空缓冲区
                 }
+                printf("%s\n", sign);
+                sendSocket(connfd, sign, strlen(sign)); //下载文件完成标准
             }
+            close(fd); //关闭文件
         }
     }
 }

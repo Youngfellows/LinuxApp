@@ -16,7 +16,10 @@ void test1()
         res = tcpClient->connectSocket(nullptr); //客户端连接Socket服务端
         if (res)
         {
-            tcpClient->inputAndSend(); //输入并发送消息给客户端
+            while (true)
+            {
+                tcpClient->inputAndSend(); //输入并发送消息给客户端
+            }
         }
     }
     cout << endl;

@@ -88,6 +88,16 @@ public:
      * @return char* 返回IP地址的字符串形式
      */
     virtual char *getIP(struct sockaddr_in *addr) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 拷贝字符串
+     * 
+     * @param s 原字符串
+     * @param d 目标字符串
+     * @param m 跳过的字节数
+     */
+    virtual void strncopy(char *s, char *d, int m) = 0;
 };
 
 #endif

@@ -84,24 +84,47 @@ char *TCPClient::input()
 
 void TCPClient::inputAndSend()
 {
+    const char *pdir = "./file/";
     printf("输入要下载的文件名:");
     char *iMsg = input(); //输入要发送的内容
     // printf("%s\n", iMsg);
     sendSocket(mSockfd, iMsg, strlen(iMsg));                 //向服务端发送消息
     char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
-    while (true)
+    char *filename = new char[strlen(iMsg) - 1];             //文件名
+    strncpy(filename, iMsg, strlen(iMsg) - 1);
+    printf("长度:%ld,文件名:%s****\n", strlen(filename), filename);
+    char *pathname = new char[strlen(pdir) + strlen(filename) + 1];
+    sprintf(pathname, "%s%s", pdir, filename); //字符串拼接
+    // const char *pathname = "./file/f1.txt";
+    printf("长度:%ld,文件路径:%s\n", strlen(pathname), pathname);
+    char *sign = "finish";
+    int fd = open(pathname, O_CREAT | O_RDWR | O_TRUNC, 0644); //打开文件
+    if (fd == -1)
     {
-        int recvbytes = receive(mSockfd, buffer, CACHESIZE);
+        perror("open file error");
+        return;
+    }
+    int recvbytes = 0;
+    memset(buffer, 0, CACHESIZE); //清空缓冲区
+    while ((recvbytes = receive(mSockfd, buffer, CACHESIZE)) > 0)
+    {
+        printf("%d:: %s\n", recvbytes, buffer);
         if (recvbytes > 0)
         {
-            printf("%s\n", buffer);
-            // buffer[recvbytes] = '\0'; //设置字符串结束标志
-            // cout << "服务端说:" << buffer << endl;
-            // printf("输入客户端发送内容:");
-            // iMsg = input();                          //输入要发送的内容
-            // sendSocket(mSockfd, iMsg, strlen(iMsg)); //向服务端发送消息
+            write(fd, buffer, recvbytes); //向文件写入内容
+        }
+        memset(buffer, 0, CACHESIZE); //清空缓冲区
+        char *dest = new char[strlen(sign)];
+        // strncopy(buffer, dest, recvbytes - strlen(sign)); //拷贝结束字符串
+        // printf("%s\n", dest);
+        if (strcmp(sign, buffer) == 0)
+        {
+            printf("break\n");
+            break;
         }
     }
+    close(fd); //关闭文件
+    printf("下载完成\n");
 }
 
 void TCPClient::closeSocket(int sockfd)
@@ -117,4 +140,28 @@ void TCPClient::destroy()
 char *TCPClient::getIP(struct sockaddr_in *addr)
 {
     return inet_ntoa(addr->sin_addr);
+}
+
+/**
+ * @brief 纯虚函数,抽象接口
+ * @brief 拷贝字符串
+ *
+ * @param s 原字符串
+ * @param d 目标字符串
+ * @param m 跳过的字节数
+ */
+void TCPClient::strncopy(char *s, char *d, int m)
+{
+    int n = 0;
+    while (n < m - 1)
+    {
+        n++;
+        s++;
+    }
+    while (*s != '\0')
+    {
+        *d = *s;
+        s++;
+        d++;
+    }
 }
