@@ -191,6 +191,7 @@ void TCPServer::threadProcess(int connfd, char *remoteIp)
                 while ((number = read(fd, buf, 100)) > 0) //读文件
                 {
                     sendSocket(connfd, buf, number); //向客户端发送文件
+                    memset(buf, 0, sizeof(buf));     //清空缓冲区F
                 }
             }
         }
