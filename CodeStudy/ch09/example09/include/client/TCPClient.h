@@ -13,6 +13,7 @@ private:
     int mSockfd;                    //服务端套接字描述符
     struct sockaddr_in mServerAddr; //服务器段地址结构体
     char *mInputBuffer = nullptr;   //输入缓冲区
+    char *mDir = nullptr;           //目录
 
 public:
     TCPClient();
@@ -26,5 +27,6 @@ public:
     virtual void closeSocket(int sockfd) override;
     virtual void destroy() override;
     virtual char *getIP(struct sockaddr_in *addr) override;
+    virtual bool writeFile(int fd, char *str) override;
 };
 #endif

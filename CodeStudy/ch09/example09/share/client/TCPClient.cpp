@@ -4,6 +4,7 @@ TCPClient::TCPClient()
 {
     cout << "TCPClient()构造函数" << endl;
     this->mInputBuffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请内存
+    this->mDir = "./file/";
 }
 
 TCPClient::~TCPClient()
@@ -84,21 +85,41 @@ char *TCPClient::input()
 
 void TCPClient::inputAndSend()
 {
-    printf("输入客户端发送内容:");
-    char *iMsg = input(); //输入要发送的内容
-    // printf("%s\n", iMsg);
-    sendSocket(mSockfd, iMsg, strlen(iMsg));                 //向服务端发送消息
+    printf("输入客户端名称:");
+    char *imsg = input();                    //输入要发送的内容
+    sendSocket(mSockfd, imsg, strlen(imsg)); //向服务端发送消息
+    char cname[strlen(imsg)];
+    strcpy(cname, imsg);
+    cname[strlen(cname) - 1] = 0;
+    char pathname[strlen(mDir) + strlen(cname)];
+    sprintf(pathname, "%s%s\0", mDir, cname);
+    printf("文件路径:%s\n", pathname);
+    int fd = open(pathname, O_WRONLY | O_CREAT | O_APPEND, 0644); //创建或者打开文件
+    if (fd == -1)
+    {
+        perror("open file error");
+        return;
+    }
+    writeFile(fd, "连接成功");                               //写入文件
     char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
     while (true)
     {
         int recvbytes = receive(mSockfd, buffer, CACHESIZE);
         if (recvbytes > 0)
         {
-            buffer[recvbytes] = '\0'; //设置字符串结束标志
-            cout << "服务端说:" << buffer << endl;
+            printf("服务端说:%s\n", buffer);
+            char serverTmp[recvbytes + 30]; //
+            sprintf(serverTmp, "服务端说:%s", buffer);
+            // buffer[recvbytes] = '\0'; //设置字符串结束标志
+            writeFile(fd, serverTmp); //写入文件
+
             printf("输入客户端发送内容:");
-            iMsg = input();                          //输入要发送的内容
+            char *iMsg = input();                    //输入要发送的内容
             sendSocket(mSockfd, iMsg, strlen(iMsg)); //向服务端发送消息
+            char clientTemp[strlen(iMsg) + 30];
+            sprintf(clientTemp, "%s:%s", cname, iMsg);
+            printf("%s", clientTemp);
+            writeFile(fd, clientTemp); //写入文件
         }
     }
 }
@@ -116,4 +137,17 @@ void TCPClient::destroy()
 char *TCPClient::getIP(struct sockaddr_in *addr)
 {
     return inet_ntoa(addr->sin_addr);
+}
+
+bool TCPClient::writeFile(int fd, char *str)
+{
+    time_t t1;
+    struct tm *t2;
+    char wtext[strlen(str) + 100];
+    t1 = time(nullptr);  //获取当前时间
+    t2 = localtime(&t1); //获取当前时间的结构体形式
+    sprintf(wtext, "%d-%d-%d %d:%d:%d", t2->tm_year + 1900, t2->tm_mon + 1, t2->tm_mday, t2->tm_hour, t2->tm_min, t2->tm_sec);
+    sprintf(wtext, "%s %s\n", wtext, str);
+    write(fd, wtext, strlen(wtext)); //把字符串写入文件
+    return true;
 }

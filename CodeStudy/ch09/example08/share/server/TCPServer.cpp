@@ -83,19 +83,6 @@ void TCPServer::acceptSocket()
 {
     struct sockaddr_in clientAddr; //客户端地址
     int clentAddrLen;              //客户端地址长度
-    // pthread_t threadId;            //线程ID
-    //  pthread_attr_t threadAttr;                //线程属性结构体
-    //  int res = pthread_attr_init(&threadAttr); //初始化线程属性结构体
-    //  if (res)
-    //  {
-    //      cout << "pthread_attr_init failed:" << res << endl;
-    //  }
-    //  res = pthread_attr_setdetachstate(&threadAttr, PTHREAD_CREATE_DETACHED); //设置分离状态
-    //  if (res)
-    //  {
-    //      cout << "pthread_attr_setdetachstate failed:" << res << endl;
-    //  }
-
     while (true)
     {
         //等待客户端连接,如果有客户端连接,则产生新的连接套接字
@@ -113,11 +100,6 @@ void TCPServer::acceptSocket()
             strcpy(remoteInfo.ip, ip);
             cout << "客户端:" << remoteInfo.ip << ",connfd:" << remoteInfo.connfd << ",连接成功了 ..." << endl;
             addConnfd(connfd, ip);
-            // res = pthread_create(&threadId, &threadAttr, TCPServer::threadProcess, (void *)&remoteInfo); //创建一个可分离线程
-            // if (res)
-            // {
-            //     cout << "pthread_create failed:" << res << endl;
-            // }
             std::thread handleThread = std::thread([this](int &connfd, char *remoteIp)
                                                    { this->threadProcess(connfd, remoteIp); },
                                                    std::ref(connfd), std::ref(ip));

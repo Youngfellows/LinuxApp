@@ -88,6 +88,17 @@ public:
      * @return char* 返回IP地址的字符串形式
      */
     virtual char *getIP(struct sockaddr_in *addr) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 把字符串写入到文件
+     *
+     * @param fd 文件描述符
+     * @param str 要写入的字符串
+     * @return true 写入文件成功
+     * @return false 写入文件失败
+     */
+    virtual bool writeFile(int fd, char *str) = 0;
 };
 
 #endif
