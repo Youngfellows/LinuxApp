@@ -14,6 +14,15 @@ public:
     virtual ~ITCPClient() = default;
 
     /**
+     * @brief  纯虚函数,抽象接口
+     * @brief  连接服务端
+     *
+     * @return true 连接服务端成功
+     * @return false 连接服务端失败
+     */
+    virtual bool connectServer() = 0;
+
+    /**
      * @brief 纯虚函数,抽象接口
      * @brief 创建TCP客户端
      *
@@ -90,7 +99,7 @@ public:
     virtual char *getIP(struct sockaddr_in *addr) = 0;
 
     /**
-     * @brief 纯虚函数,抽象接口
+     *
      * @brief 解析命令行参数
      *
      * @param buf 命令行参数
@@ -98,6 +107,48 @@ public:
      * @return int 返回命令行参数字符串数组长度
      */
     virtual int parse(char *buf, char **args) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 显示帮助信息
+     *
+     */
+    virtual void processMenu() = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 客户端退出
+     *
+     * @param addr 服务端IP地址
+     */
+    virtual void processExit(struct sockaddr_in addr) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 处理ls命令
+     *
+     * @param addr 服务端IP地址
+     * @param cmd 命令行参数
+     */
+    virtual void processLs(struct sockaddr_in addr, char *cmd) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 处理get命令
+     *
+     * @param addr 服务端IP地址
+     * @param cmd 命令行参数
+     */
+    virtual void processGet(struct sockaddr_in addr, char *cmd) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 处理put命令
+     *
+     * @param addr 服务端IP地址
+     * @param cmd 命令行参数
+     */
+    virtual void processPut(struct sockaddr_in addr, char *cmd) = 0;
 };
 
 #endif

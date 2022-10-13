@@ -17,6 +17,7 @@ private:
 public:
     TCPClient();
     ~TCPClient();
+    virtual bool connectServer() override;
     virtual bool create() override;
     virtual bool connectSocket(char *serverIp) override;
     virtual int receive(int sockfd, void *buffer, size_t size) override;
@@ -27,5 +28,10 @@ public:
     virtual void destroy() override;
     virtual char *getIP(struct sockaddr_in *addr) override;
     virtual int parse(char *buf, char **args) override;
+    virtual void processMenu() override;
+    virtual void processExit(struct sockaddr_in addr) override;
+    virtual void processLs(struct sockaddr_in addr, char *cmd) override;
+    virtual void processGet(struct sockaddr_in addr, char *cmd) override;
+    virtual void processPut(struct sockaddr_in addr, char *cmd) override;
 };
 #endif

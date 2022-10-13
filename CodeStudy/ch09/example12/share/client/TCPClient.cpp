@@ -12,6 +12,17 @@ TCPClient::~TCPClient()
     free(mInputBuffer); //释放内存
 }
 
+bool TCPClient::connectServer()
+{
+    bool res = this->create(); //创建Socket连接
+    if (res)
+    {
+        res = this->connectSocket(nullptr); //客户端连接Socket服务端
+        return res;
+    }
+    return false;
+}
+
 bool TCPClient::create()
 {
     this->mSockfd = socket(AF_INET, SOCK_STREAM, 0); //创建socket套接字
@@ -77,28 +88,68 @@ char *TCPClient::input()
 {
     memset(mInputBuffer, 0, CACHESIZE * sizeof(char));        //清空缓冲区
     fgets(mInputBuffer, CACHESIZE * sizeof(char) - 1, stdin); //输入字符串
-    // getchar();                                                //吸收一个空格
-    printf("*************\n");
     return mInputBuffer;
 }
 
 void TCPClient::inputAndSend()
 {
-    printf("输入客户端发送内容:");
-    char *iMsg = input(); //输入要发送的内容
-    // printf("%s\n", iMsg);
-    sendSocket(mSockfd, iMsg, strlen(iMsg));                 //向服务端发送消息
-    char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
+    // printf("输入客户端发送内容:");
+    // char *iMsg = input(); //输入要发送的内容
+    // // printf("%s\n", iMsg);
+    // sendSocket(mSockfd, iMsg, strlen(iMsg));                 //向服务端发送消息
+    // char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
+    // while (true)
+    // {
+    //     int recvbytes = receive(mSockfd, buffer, CACHESIZE);
+    //     if (recvbytes > 0)
+    //     {
+    //         buffer[recvbytes] = '\0'; //设置字符串结束标志
+    //         cout << "服务端说:" << buffer << endl;
+    //         printf("输入客户端发送内容:");
+    //         iMsg = input();                          //输入要发送的内容
+    //         sendSocket(mSockfd, iMsg, strlen(iMsg)); //向服务端发送消息
+    //     }
+    // }
+
     while (true)
     {
-        int recvbytes = receive(mSockfd, buffer, CACHESIZE);
-        if (recvbytes > 0)
+        printf(">");
+        char *cmd = input();
+        if (cmd == nullptr)
         {
-            buffer[recvbytes] = '\0'; //设置字符串结束标志
-            cout << "服务端说:" << buffer << endl;
-            printf("输入客户端发送内容:");
-            iMsg = input();                          //输入要发送的内容
-            sendSocket(mSockfd, iMsg, strlen(iMsg)); //向服务端发送消息
+            printf("fgets error");
+            break;
+        }
+        if (strlen(cmd) == 1)
+        {
+            continue;
+        }
+        cmd[strlen(cmd) - 1] = '\0';
+        printf("<%s\n", cmd);
+        if (strncmp(cmd, "help", 4) == 0)
+        {
+            processMenu();
+        }
+        else if (strncmp(cmd, "exit", 4) == 0)
+        {
+            processExit(mServerAddr);
+            exit(0);
+        }
+        else if (strncmp(cmd, "ls", 2) == 0)
+        {
+            processLs(mServerAddr, cmd);
+        }
+        else if (strncmp(cmd, "get", 3) == 0)
+        {
+            processGet(mServerAddr, cmd);
+        }
+        else if (strncmp(cmd, "put", 3) == 0)
+        {
+            processPut(mServerAddr, cmd);
+        }
+        else
+        {
+            printf("输入命令错误,请重新输入\n");
         }
     }
 }
@@ -136,4 +187,64 @@ int TCPClient::parse(char *buf, char **args)
     }
     *args = nullptr;
     return num;
+}
+
+void TCPClient::processMenu()
+{
+    printf("\n--------------------------------------------\n");
+    printf("| hele: 显示全部帮助命令\n");
+    printf("| exit: 退出\n");
+    printf("| ls  : 显示服务端文件名称列表\n");
+    printf("| get 文件名: 下载服务端文件\n");
+    printf("| pug 文件名: 上传文件到服务端\n");
+    printf("--------------------------------------------\n");
+}
+
+void TCPClient::processExit(struct sockaddr_in addr)
+{
+    char *byte = "Byte!";
+    printf("%s\n", byte);
+    sendSocket(mSockfd, byte, strlen(byte));
+    closeSocket(mSockfd);
+}
+
+void TCPClient::processLs(struct sockaddr_in addr, char *cmd)
+{
+    sendSocket(mSockfd, cmd, strlen(cmd));
+    char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
+    int recvbytes = 0;
+    while ((recvbytes = receive(mSockfd, buffer, CACHESIZE)) > 0)
+    {
+        printf("%s", buffer);
+        if (strncmp(buffer, "#", 1) == 0)
+        {
+            // printf("break");
+            break;
+        }
+        memset(buffer, 0, sizeof(buffer)); //清空内存
+    }
+    printf("\n");
+    free(buffer);
+}
+
+void TCPClient::processGet(struct sockaddr_in addr, char *cmd)
+{
+    char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
+    int recvbytes = 0;
+    while ((recvbytes = receive(mSockfd, buffer, CACHESIZE)) > 0)
+    {
+        printf("%s", buffer);
+        if (strncmp(buffer, "#", 1) == 0)
+        {
+            // printf("break");
+            break;
+        }
+        memset(buffer, 0, sizeof(buffer)); //清空内存
+    }
+    printf("\n");
+    free(buffer);
+}
+
+void TCPClient::processPut(struct sockaddr_in addr, char *cmd)
+{
 }

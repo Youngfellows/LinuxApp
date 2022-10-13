@@ -8,13 +8,14 @@ void test1()
 {
     cout << "test1():: ..." << endl;
     std::shared_ptr<ITCPClient> tcpClient = std::make_shared<TCPClient>();
+    tcpClient->processMenu();       //显示帮助菜单
     bool res = tcpClient->create(); //创建Socket连接
     if (res)
     {
         res = tcpClient->connectSocket(nullptr); //客户端连接Socket服务端
         if (res)
         {
-            tcpClient->inputAndSend(); //输入并发送消息给客户端
+            tcpClient->inputAndSend(); //输入并连接客户端
         }
     }
     cout << endl;

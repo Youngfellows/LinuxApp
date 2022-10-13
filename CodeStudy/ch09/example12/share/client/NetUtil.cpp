@@ -24,9 +24,9 @@ char *NetUtil::getIP()
     {
         iplist[i] = (char *)malloc(sizeof(char *));
     }
-    printf("%s\n", iplist[0]);
+    // printf("%s\n", iplist[0]);
     int count = getIp(iplist, size); //获取IP地址
-    printf("NetUtil::getIP():: IP地址列表个数:%d\n", count);
+    // printf("NetUtil::getIP():: IP地址列表个数:%d\n", count);
     if (count > 0)
     {
         char *ip = iplist[0]; //获取第一个IP地址
@@ -45,7 +45,7 @@ char *NetUtil::getIP()
  */
 int NetUtil::getIp(char **ipList, int size)
 {
-    printf("getIp():: ...\n");
+    // printf("getIp():: ...\n");
     char computer[256];                            //本地主机名
     int ret;                                       //获取本地主机名结果
     struct hostent *hp;                            //保存IP地址信息的结构体
@@ -57,7 +57,7 @@ int NetUtil::getIp(char **ipList, int size)
     }
     else if (ret == 0)
     {
-        printf("getIp():: 获取本地主机名成功:%s\n", computer);
+        // printf("getIp():: 获取本地主机名成功:%s\n", computer);
         hp = gethostbyname(computer); //将本地主机名转换为IP地址
         if (hp == nullptr)
         {
@@ -74,15 +74,15 @@ int NetUtil::getIp(char **ipList, int size)
                 char *ip = inet_ntoa(in);                  //将整数的IP地址转换为点分十进制字符串形式的IP地址
                 char *hostName = hp->h_name;               //主机的正式名称
                 strcpy(ipList[count], ip);                 //对字符串数组从新赋值
-                printf("getIp():: 正式主机名:%s,IP:%s,", hostName, ip);
-                printf("ipList[%d]:%s ,", count, ipList[count]);
+                // printf("getIp():: 正式主机名:%s,IP:%s,", hostName, ip);
+                // printf("ipList[%d]:%s ,", count, ipList[count]);
                 char **q; //主机的别名
-                printf("别名:");
+                // printf("别名:");
                 for (q = hp->h_aliases; *q != nullptr; q++)
                 {
-                    printf(" %s", *q);
+                    // printf(" %s", *q);
                 }
-                putchar('\n');
+                // putchar('\n');
                 count++;
             }
         }
