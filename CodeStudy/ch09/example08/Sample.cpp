@@ -3,26 +3,28 @@
 void test1()
 {
     cout << "test1():: ..." << endl;
-    const char *patnname = "./file/f1.txt";
-    int fd = open(patnname, O_RDWR);
-    if (fd == -1)
-    {
-        perror("open file error");
-        return;
-    }
-    char cachBuff[MAXSIZE]; //缓冲区
-    int number = 0;
-    while ((number = read(fd, cachBuff, MAXSIZE)) > 0)
-    {
-        printf("%s\n", cachBuff);
-    }
-
+    NetUtil::getIP();
     cout << endl;
 }
 
 void test2()
 {
     cout << "test2():: ..." << endl;
+    std::shared_ptr<TCPServer> tcpServer = std::make_shared<TCPServer>();
+    bool res = tcpServer->create(); //创建TCP服务端
+    if (res)
+    {
+        res = tcpServer->bindSocket(); //绑定本机网络地址信息
+        if (res)
+        {
+            res = tcpServer->listenSocket(); //监听TCP Socket套接字
+            if (res)
+            {
+                tcpServer->acceptSocket(); //等待客户端来连接服务端
+            }
+        }
+    }
+
     cout << endl;
 }
 
