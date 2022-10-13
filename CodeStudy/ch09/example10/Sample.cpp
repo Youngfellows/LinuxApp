@@ -27,9 +27,9 @@ void test1()
             char *tcmd = cmds[i];
             printf("%d:%s\n", i, tcmd);
         }
-    }
 
-    cout << endl;
+        cout << endl;
+    }
 }
 
 /**
@@ -58,7 +58,7 @@ int parse(char *buf, char **args)
         }
         // printf("2,%d:%s\n", num, buf);
     }
-    //*args = '\0';
+    *args = nullptr;
     return num;
 }
 

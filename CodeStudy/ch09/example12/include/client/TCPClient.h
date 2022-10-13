@@ -26,5 +26,6 @@ public:
     virtual void closeSocket(int sockfd) override;
     virtual void destroy() override;
     virtual char *getIP(struct sockaddr_in *addr) override;
+    virtual int parse(char *buf, char **args) override;
 };
 #endif

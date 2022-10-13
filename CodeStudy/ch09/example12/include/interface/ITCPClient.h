@@ -88,6 +88,16 @@ public:
      * @return char* 返回IP地址的字符串形式
      */
     virtual char *getIP(struct sockaddr_in *addr) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 解析命令行参数
+     *
+     * @param buf 命令行参数
+     * @param args 命令行参数字符串数组
+     * @return int 返回命令行参数字符串数组长度
+     */
+    virtual int parse(char *buf, char **args) = 0;
 };
 
 #endif

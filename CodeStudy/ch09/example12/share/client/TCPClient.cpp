@@ -117,3 +117,23 @@ char *TCPClient::getIP(struct sockaddr_in *addr)
 {
     return inet_ntoa(addr->sin_addr);
 }
+
+int TCPClient::parse(char *buf, char **args)
+{
+    int num = 0;
+    while (*buf != '\0')
+    {
+        while ((*buf == ' ') || (*buf == '\t') || (*buf == '\n'))
+        {
+            *buf++ = '\0';
+        }
+        *args++ = buf;
+        ++num;
+        while ((*buf != '\0') && (*buf != ' ') && (*buf != '\t') && (*buf != '\n'))
+        {
+            buf++;
+        }
+    }
+    *args = nullptr;
+    return num;
+}
