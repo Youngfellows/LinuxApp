@@ -341,8 +341,26 @@ void TCPServer::processLs(int sockfd)
 {
 }
 
-void TCPServer::processGet(int sockfd, char *fileName)
+void TCPServer::processGet(int sockfd, char *buffer)
 {
+    char *pathname = parseFileName(buffer);
+    int fd = open(pathname, O_RDONLY); //打开文件
+    if (fd == -1)
+    {
+        perror("process get failed");
+        return;
+    }
+    int number = 0;
+    char *cacheBuffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请内存
+    memset(cacheBuffer, 0, CACHESIZE * sizeof(char));             //清空缓冲区
+    while ((number = read(fd, cacheBuffer, CACHESIZE)) > 0)
+    {
+        sendSocket(sockfd, cacheBuffer, number);          //向客户端发送读取到的文件
+        memset(cacheBuffer, 0, CACHESIZE * sizeof(char)); //清空缓冲区
+    }
+    char *end = "#end#";
+    sendSocket(sockfd, end, strlen(end)); //发送结束标志
+    close(fd);                            //关闭文件
 }
 
 void TCPServer::processPut(int fd, char *buffer)

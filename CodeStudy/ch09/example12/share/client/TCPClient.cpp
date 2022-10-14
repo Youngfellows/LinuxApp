@@ -248,13 +248,8 @@ void TCPClient::processGet(struct sockaddr_in addr, char *cmd)
     int recvbytes = 0;
     while ((recvbytes = receive(mSockfd, buffer, CACHESIZE)) > 0)
     {
-        printf("%s", buffer);
-        write(fd, buffer, recvbytes); //向文件写入内容
-        if (strncmp(buffer, "#", 1) == 0)
-        {
-            // printf("break");
-            break;
-        }
+        // printf("%s", buffer);
+        write(fd, buffer, recvbytes);      //向文件写入内容
         memset(buffer, 0, sizeof(buffer)); //清空内存
     }
     printf("\n");

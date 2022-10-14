@@ -34,8 +34,8 @@ public:
     virtual char *getIP(struct sockaddr_in *addr) override;
     virtual int parse(char *buf, char **args) override;
     virtual void processLs(int sockfd) override;
-    virtual void processGet(int sockfd, char *fileName) override;
-    virtual void processPut(int fd, char *fileName) override;
+    virtual void processGet(int sockfd, char *buffer) override;
+    virtual void processPut(int fd, char *buffer) override;
 
 private:
     void threadProcess(int connfd, char *remoteIp); //线程回调函数

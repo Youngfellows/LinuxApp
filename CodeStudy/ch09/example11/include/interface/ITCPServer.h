@@ -120,18 +120,18 @@ public:
      * @brief 获取服务端指定文件
      *
      * @param sockfd Socket套接字
-     * @param fileName 要获取的文件名称
+     * @param buffer 命令行
      */
-    virtual void processGet(int sockfd, char *fileName) = 0;
+    virtual void processGet(int sockfd, char *buffer) = 0;
 
     /**
      * @brief 纯虚函数,抽象接口
      * @brief 上传文件到服务端
      *
      * @param fd 文件描述符
-     * @param fileName 上传的文件名称
+     * @param buffer 命令行
      */
-    virtual void processPut(int fd, char *fileName) = 0;
+    virtual void processPut(int fd, char *buffer) = 0;
 };
 
 #endif
