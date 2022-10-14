@@ -2,6 +2,11 @@
 
 /**
  * @brief TCP客户端
+ * @brief 测试: help
+ * @brief 测试: exit
+ * @brief 测试: ls
+ * @brief 测试: get ./file/f1.txt
+ * @brief 测试: put ./file/f2.txt
  *
  */
 void test1()

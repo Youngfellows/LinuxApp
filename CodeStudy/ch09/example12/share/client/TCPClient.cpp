@@ -229,11 +229,27 @@ void TCPClient::processLs(struct sockaddr_in addr, char *cmd)
 
 void TCPClient::processGet(struct sockaddr_in addr, char *cmd)
 {
+    sendSocket(mSockfd, cmd, strlen(cmd));
+    char *cmds[N];                 //命令行参数字符串数组
+    int number = parse(cmd, cmds); //解析命令行参数
+    if (number < 2)
+    {
+        return;
+    }
+    char *pathname = cmds[1]; //文件名
+    // printf("文件名:%s\n", pathname);
+    int fd = open(pathname, O_CREAT | O_WRONLY | O_TRUNC, 0644); //创建文件并打开
+    if (fd == -1)
+    {
+        perror("open file error");
+        return;
+    }
     char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
     int recvbytes = 0;
     while ((recvbytes = receive(mSockfd, buffer, CACHESIZE)) > 0)
     {
         printf("%s", buffer);
+        write(fd, buffer, recvbytes); //向文件写入内容
         if (strncmp(buffer, "#", 1) == 0)
         {
             // printf("break");
@@ -242,9 +258,35 @@ void TCPClient::processGet(struct sockaddr_in addr, char *cmd)
         memset(buffer, 0, sizeof(buffer)); //清空内存
     }
     printf("\n");
-    free(buffer);
+    close(fd);    //关闭文件
+    free(buffer); //释放内存
 }
 
 void TCPClient::processPut(struct sockaddr_in addr, char *cmd)
 {
+    sendSocket(mSockfd, cmd, strlen(cmd));
+    char *cmds[N];                 //命令行参数字符串数组
+    int number = parse(cmd, cmds); //解析命令行参数
+    if (number < 2)
+    {
+        return;
+    }
+    char *pathname = cmds[1]; //文件名
+    // printf("文件名:%s\n", pathname);
+    int fd = open(pathname, O_RDONLY); //打开文件
+    if (fd == -1)
+    {
+        perror("open file failed");
+        return;
+    }
+    char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
+    int readbytes = 0;
+    while ((readbytes = read(fd, buffer, CACHESIZE)) > 0) //读取文件内容并传递
+    {
+        sendSocket(mSockfd, buffer, readbytes); //向客户端传输文件内容
+        memset(buffer, 0, sizeof(buffer));      //清空内存
+    }
+    printf("\n");
+    close(fd); //关闭文件
+    free(buffer);
 }
