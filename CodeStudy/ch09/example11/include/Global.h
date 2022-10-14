@@ -28,5 +28,5 @@ using namespace std;
 const int SERVPORT = 3333;  //端口号
 const int BACKLOG = 10;     //最大同时连接请求数
 const int CACHESIZE = 1024; //缓冲区大小
-
+const int N = 64;           //命令行参数
 #endif

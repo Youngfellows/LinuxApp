@@ -17,6 +17,7 @@ private:
     struct sockaddr_in mServerAddr;                            //服务器段地址结构体
     pthread_mutex_t mMutex;                                    //线程互斥锁
     char *mInputBuffer = nullptr;                              //输入缓冲区
+    bool isUpload = false;                                     //是否在上传
 
 public:
     TCPServer();
@@ -31,11 +32,16 @@ public:
     virtual void closeSocket(int sockfd) override;
     virtual void destroy() override;
     virtual char *getIP(struct sockaddr_in *addr) override;
+    virtual int parse(char *buf, char **args) override;
+    virtual void processLs(int sockfd) override;
+    virtual void processGet(int sockfd, char *fileName) override;
+    virtual void processPut(int fd, char *fileName) override;
 
 private:
     void threadProcess(int connfd, char *remoteIp); //线程回调函数
     void addConnfd(int connfd, char *remoteIp);
     void removeConnfd(int connfd);
+    char *parseFileName(char *cmd);
 };
 
 #endif

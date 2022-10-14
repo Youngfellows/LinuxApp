@@ -196,7 +196,7 @@ void TCPClient::processMenu()
     printf("| exit: 退出\n");
     printf("| ls  : 显示服务端文件名称列表\n");
     printf("| get 文件名: 下载服务端文件\n");
-    printf("| pug 文件名: 上传文件到服务端\n");
+    printf("| put 文件名: 上传文件到服务端\n");
     printf("--------------------------------------------\n");
 }
 
@@ -286,6 +286,8 @@ void TCPClient::processPut(struct sockaddr_in addr, char *cmd)
         sendSocket(mSockfd, buffer, readbytes); //向客户端传输文件内容
         memset(buffer, 0, sizeof(buffer));      //清空内存
     }
+    char *end = "#end#";
+    sendSocket(mSockfd, end, strlen(end)); //发送结束标志
     printf("\n");
     close(fd); //关闭文件
     free(buffer);

@@ -96,6 +96,42 @@ public:
      * @return char* 返回IP地址的字符串形式
      */
     virtual char *getIP(struct sockaddr_in *addr) = 0;
+
+    /**
+     *
+     * @brief 解析命令行参数
+     *
+     * @param buf 命令行参数
+     * @param args 命令行参数字符串数组
+     * @return int 返回命令行参数字符串数组长度
+     */
+    virtual int parse(char *buf, char **args) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 获取服务端文件列表
+     *
+     * @param sockfd Socket套接字
+     */
+    virtual void processLs(int sockfd) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 获取服务端指定文件
+     *
+     * @param sockfd Socket套接字
+     * @param fileName 要获取的文件名称
+     */
+    virtual void processGet(int sockfd, char *fileName) = 0;
+
+    /**
+     * @brief 纯虚函数,抽象接口
+     * @brief 上传文件到服务端
+     *
+     * @param fd 文件描述符
+     * @param fileName 上传的文件名称
+     */
+    virtual void processPut(int fd, char *fileName) = 0;
 };
 
 #endif

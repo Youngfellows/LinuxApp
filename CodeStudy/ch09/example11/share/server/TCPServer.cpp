@@ -162,16 +162,54 @@ void TCPServer::threadProcess(int connfd, char *remoteIp)
 {
     cout << "ThreadId:" << pthread_self() << ",connfd:" << connfd << ",IP:" << remoteIp << endl;
     char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
+    int fd = -1;                                             //上传文件的文件描述符
     while (true)
     {
+        memset(buffer, 0, CACHESIZE * sizeof(char));
         int recvbytes = receive(connfd, buffer, CACHESIZE);
         if (recvbytes > 0)
         {
-            buffer[recvbytes] = '\0'; //设置字符串结束标志
-            cout << "客户端说:" << buffer << endl;
-            printf("回客户端:");
-            char *iMsg = input();                   //输入要回复的消息
-            sendSocket(connfd, iMsg, strlen(iMsg)); //测试,原样返回
+            // buffer[recvbytes] = '\0'; //设置字符串结束标志
+            // cout << "客户端说:" << buffer << endl;
+            // printf("回客户端:");
+            // char *iMsg = input();                   //输入要回复的消息
+            // sendSocket(connfd, iMsg, strlen(iMsg)); //测试,原样返回
+            if (isUpload)
+            {
+                if (strncmp(buffer, "#end#", 3) == 0)
+                {
+                    isUpload = false;
+                    close(fd); //关闭文件
+                    fd = -1;
+                }
+                else
+                {
+                    processPut(fd, buffer); //把数据写入文件
+                }
+            }
+            else
+            {
+                if (strncmp(buffer, "ls", 2) == 0)
+                {
+                    processLs(connfd);
+                }
+                else if (strncmp(buffer, "get", 3) == 0)
+                {
+                    processGet(connfd, buffer);
+                }
+                else if (strncmp(buffer, "put", 3) == 0)
+                {
+                    isUpload = true;
+                    char *fileName = parseFileName(buffer);
+                    printf("文件名:%s\n", fileName);
+                    fd = open(fileName, O_CREAT | O_WRONLY | O_TRUNC, 0644); //创建文件并打开
+                    if (fd == -1)
+                    {
+                        perror("open file failed");
+                        isUpload = false;
+                    }
+                }
+            }
         }
     }
 }
@@ -264,4 +302,54 @@ void TCPServer::destroy()
 char *TCPServer::getIP(struct sockaddr_in *addr)
 {
     return inet_ntoa(addr->sin_addr);
+}
+
+int TCPServer::parse(char *buf, char **args)
+{
+    int num = 0;
+    while (*buf != '\0')
+    {
+        while ((*buf == ' ') || (*buf == '\t') || (*buf == '\n'))
+        {
+            *buf++ = '\0';
+        }
+        *args++ = buf;
+        ++num;
+        while ((*buf != '\0') && (*buf != ' ') && (*buf != '\t') && (*buf != '\n'))
+        {
+            buf++;
+        }
+    }
+    *args = nullptr;
+    return num;
+}
+
+char *TCPServer::parseFileName(char *cmd)
+{
+    char *cmds[N];                 //命令行参数字符串数组
+    int number = parse(cmd, cmds); //解析命令行参数
+    if (number < 2)
+    {
+        return nullptr;
+    }
+    // char *pathname = (char *)malloc(strlen(cmds[1]) * sizeof(char)); //动态申请内存
+    // strcpy(pathname, cmds[1]);                                       //拷贝字符串到内存
+    return cmds[1];
+}
+
+void TCPServer::processLs(int sockfd)
+{
+}
+
+void TCPServer::processGet(int sockfd, char *fileName)
+{
+}
+
+void TCPServer::processPut(int fd, char *buffer)
+{
+    if (write(fd, buffer, strlen(buffer)) < 0) //向文件写入内容
+    {
+        perror("process put write failed");
+        close(fd);
+    }
 }
