@@ -215,12 +215,7 @@ void TCPClient::processLs(struct sockaddr_in addr, char *cmd)
     int recvbytes = 0;
     while ((recvbytes = receive(mSockfd, buffer, CACHESIZE)) > 0)
     {
-        printf("%s", buffer);
-        if (strncmp(buffer, "#", 1) == 0)
-        {
-            // printf("break");
-            break;
-        }
+        printf("***%s", buffer);
         memset(buffer, 0, sizeof(buffer)); //清空内存
     }
     printf("\n");

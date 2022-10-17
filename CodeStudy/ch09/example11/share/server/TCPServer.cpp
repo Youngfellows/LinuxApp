@@ -339,6 +339,28 @@ char *TCPServer::parseFileName(char *cmd)
 
 void TCPServer::processLs(int sockfd)
 {
+    printf("TCPServer::processLs():: ...\n");
+    DIR *myDir = nullptr;            //目录
+    struct dirent *myItem = nullptr; //目录项
+    char buffer[CACHESIZE];
+    bzero(buffer, CACHESIZE);
+    if ((myDir = opendir(".")) == nullptr)
+    {
+        perror("opendir failed");
+        return;
+    }
+    while ((myItem = readdir(myDir)) != nullptr)
+    {
+        if (sprintf(buffer, myItem->d_name, CACHESIZE) < 0)
+        {
+            printf("sprintf error");
+            break;
+        }
+        printf("%s\n", buffer);
+        sendSocket(sockfd, buffer, strlen(buffer)); //向客户端发送
+    }
+    closedir(myDir);
+    // closeSocket();
 }
 
 void TCPServer::processGet(int sockfd, char *buffer)
