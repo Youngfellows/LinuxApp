@@ -213,12 +213,17 @@ void TCPClient::processLs(struct sockaddr_in addr, char *cmd)
     sendSocket(mSockfd, cmd, strlen(cmd));
     char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请缓冲区内存
     int recvbytes = 0;
+    printf("TCPClient::processLs():: wait ...\n");
     while ((recvbytes = receive(mSockfd, buffer, CACHESIZE)) > 0)
     {
-        printf("***%s", buffer);
+        printf("%s\n", buffer);
+        if (strncmp(buffer, "#end#", 5) == 0)
+        {
+            break;
+        }
         memset(buffer, 0, sizeof(buffer)); //清空内存
     }
-    printf("\n");
+    printf("TCPClient::processLs():: end ...\n");
     free(buffer);
 }
 
@@ -243,11 +248,16 @@ void TCPClient::processGet(struct sockaddr_in addr, char *cmd)
     int recvbytes = 0;
     while ((recvbytes = receive(mSockfd, buffer, CACHESIZE)) > 0)
     {
-        // printf("%s", buffer);
+        printf("%d,%s\n", recvbytes, buffer);
+        if (strncmp(buffer, "#end#", 5) == 0)
+        {
+            printf("break ...\n");
+            break;
+        }
         write(fd, buffer, recvbytes);      //向文件写入内容
         memset(buffer, 0, sizeof(buffer)); //清空内存
     }
-    printf("\n");
+    printf("xxxxx\n");
     close(fd);    //关闭文件
     free(buffer); //释放内存
 }

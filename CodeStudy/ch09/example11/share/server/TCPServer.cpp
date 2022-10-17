@@ -339,11 +339,12 @@ char *TCPServer::parseFileName(char *cmd)
 
 void TCPServer::processLs(int sockfd)
 {
-    printf("TCPServer::processLs():: ...\n");
-    DIR *myDir = nullptr;            //目录
-    struct dirent *myItem = nullptr; //目录项
-    char buffer[CACHESIZE];
-    bzero(buffer, CACHESIZE);
+    printf("TCPServer::processLs():: start ...\n");
+    DIR *myDir = nullptr;                                    //目录
+    struct dirent *myItem = nullptr;                         //目录项
+    char *buffer = (char *)malloc(CACHESIZE * sizeof(char)); //动态申请内存
+    memset(buffer, 0, CACHESIZE * sizeof(char));             //清空缓冲区
+    bzero(buffer, CACHESIZE * sizeof(char));
     if ((myDir = opendir(".")) == nullptr)
     {
         perror("opendir failed");
@@ -351,16 +352,19 @@ void TCPServer::processLs(int sockfd)
     }
     while ((myItem = readdir(myDir)) != nullptr)
     {
-        if (sprintf(buffer, myItem->d_name, CACHESIZE) < 0)
+        if (sprintf(buffer, myItem->d_name, CACHESIZE * sizeof(char)) < 0)
         {
             printf("sprintf error");
             break;
         }
         printf("%s\n", buffer);
         sendSocket(sockfd, buffer, strlen(buffer)); //向客户端发送
+        bzero(buffer, CACHESIZE * sizeof(char));
     }
     closedir(myDir);
-    // closeSocket();
+    char *end = "#end#";
+    sendSocket(sockfd, end, strlen(end)); //发送结束标志
+    printf("TCPServer::processLs():: end ...\n");
 }
 
 void TCPServer::processGet(int sockfd, char *buffer)
@@ -377,7 +381,8 @@ void TCPServer::processGet(int sockfd, char *buffer)
     memset(cacheBuffer, 0, CACHESIZE * sizeof(char));             //清空缓冲区
     while ((number = read(fd, cacheBuffer, CACHESIZE)) > 0)
     {
-        sendSocket(sockfd, cacheBuffer, number);          //向客户端发送读取到的文件
+        sendSocket(sockfd, cacheBuffer, number); //向客户端发送读取到的文件
+        // bzero(cacheBuffer, CACHESIZE * sizeof(char));
         memset(cacheBuffer, 0, CACHESIZE * sizeof(char)); //清空缓冲区
     }
     char *end = "#end#";
